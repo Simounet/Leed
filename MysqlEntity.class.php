@@ -427,10 +427,9 @@ class MysqlEntity
     */
 
     public function tableExists() {
-        $table = '`'.MYSQL_PREFIX.$this->TABLE_NAME.'';
+        $table = MYSQL_PREFIX.$this->TABLE_NAME;
         $result = $this->customQuery("SHOW TABLES LIKE '$table'");
-        $assoc = $result->fetch_assoc();
-        return false===$assoc ? false : true;
+        return $result->num_rows > 0;
     }
 
     /**
