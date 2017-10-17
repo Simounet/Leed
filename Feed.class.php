@@ -278,11 +278,21 @@ class Feed extends MysqlEntity{
         return $unreads;
     }
 
-    function getFeedsPerFolder(){
+    function getFeedsPerFolder($userId){
         $feedsFolderMap = array();
         $feedsIdMap = array();
 
-        $results = Feed::customQuery("SELECT `".MYSQL_PREFIX."feed`.`name` AS name, `".MYSQL_PREFIX."feed`.`id`   AS id, `".MYSQL_PREFIX."feed`.`url`  AS url, `".MYSQL_PREFIX."folder`.`id` AS folder FROM `".MYSQL_PREFIX."feed` INNER JOIN `".MYSQL_PREFIX."folder` ON ( `".MYSQL_PREFIX."feed`.`folder` = `".MYSQL_PREFIX."folder`.`id` ) ORDER BY `".MYSQL_PREFIX."feed`.`name` ;");
+        $results = Feed::customQuery(
+            "SELECT " .
+                "`".MYSQL_PREFIX."feed`.`name` AS name," .
+                "`".MYSQL_PREFIX."feed`.`id`   AS id, " .
+                "`".MYSQL_PREFIX."feed`.`url`  AS url, " .
+                "`".MYSQL_PREFIX."folder`.`id` AS folder " .
+            "FROM `".MYSQL_PREFIX."feed` " .
+            "INNER JOIN `".MYSQL_PREFIX."folder` " .
+            "ON ( `".MYSQL_PREFIX."feed`.`folder` = `".MYSQL_PREFIX."folder`.`id` ) " .
+            "WHERE `".MYSQL_PREFIX."feed`.`userid`=". $userId ." " .
+            "ORDER BY `".MYSQL_PREFIX."feed`.`name` ;");
         if($results!=false){
             while($item = $results->fetch_array()){
                 $name = $item['name'];
@@ -298,6 +308,14 @@ class Feed extends MysqlEntity{
         $feeds['folderMap'] = $feedsFolderMap;
         $feeds['idMap'] = $feedsIdMap;
         return $feeds;
+    }
+
+    public function getFeedsIdsFromIdMap($idMap) {
+        $userFeeds = array();
+        foreach($idMap as $feedId => $feedName) {
+            $userFeeds[] = $feedId;
+        }
+        return $userFeeds;
     }
 
     function getFolder(){
@@ -326,7 +344,7 @@ class Feed extends MysqlEntity{
 
     /** @returns vrai si l'url n'est pas déjà connue .*/
     function notRegistered($userId) {
-        return $this->rowCount(array('userid' => $userId),array('url' => $this->url)) == 0;
+        return $this->rowCount(array('userid' => $userId,'url' => $this->url)) == 0;
     }
 
     public function synchronize($feeds, $syncTypeStr, $commandLine, $configurationManager, $start) {

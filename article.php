@@ -13,7 +13,7 @@ Plugin::callHook("index_pre_treatment", array(&$_));
 $view = "article";
 $articleConf = array();
 //recuperation de tous les flux
-$allFeeds = $feedManager->getFeedsPerFolder();
+$allFeeds = $feedManager->getFeedsPerFolder($myUser->getId());
 $tpl->assign('allFeeds',$allFeeds);
 $scroll = isset($_['scroll']) ? $_['scroll'] : 0;
 $tpl->assign('scrollpage',$scroll);
@@ -53,7 +53,7 @@ if ($articleConf['startArticle'] < 0) $articleConf['startArticle']=0;
 $action = $_['action'];
 $tpl->assign('action',$action);
 
-$filter = array();
+$filter = array('feed'=>$feedManager->getFeedsIdsFromIdMap($allFeeds['idMap']));
 Plugin::callHook("article_pre_action", array(&$_,&$filter,&$articleConf));
 switch($action){
     /* AFFICHAGE DES EVENEMENTS D'UN FLUX EN PARTICULIER */

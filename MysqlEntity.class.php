@@ -467,9 +467,14 @@ class MysqlEntity
             $whereClause .= ' WHERE ';
             $i = false;
             foreach($columns as $column=>$value){
-                $customQueryOperator = $this->getCustomQueryOperator($operation_default, $value);
-                if($i){$whereClause .=' AND ';}else{$i=true;}
-                $whereClause .= '`'.$column.'`'.$customQueryOperator[0].'"'.$this->secure($customQueryOperator[1], $column).'"';
+                //@TOFACTO
+                $values = !is_array($value) ? array($value) : $value;
+                foreach($values as $val) {
+                    $customQueryOperator = $this->getCustomQueryOperator($operation_default, $val);
+                    $condition = count($values) > 1 ? 'OR' : 'AND';
+                    if($i){$whereClause .=' ' . $condition . ' ';}else{$i=true;}
+                    $whereClause .= '`'.$column.'`'.$customQueryOperator[0].'"'.$this->secure($customQueryOperator[1], $column).'"';
+                }
             }
         }
 

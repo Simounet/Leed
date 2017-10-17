@@ -16,11 +16,11 @@ $action = (isset($_['action'])?$_['action']:'');
 $tpl->assign('action',$action);
 if($isAlwaysDisplayed) {
     //Récuperation des dossiers de flux par ordre de nom
-    $tpl->assign('folders',$folderManager->populate('name'));
+    $tpl->assign('folders',$folderManager->loadAllOnlyColumn('*',array('userid' => $myUser->getId()), 'name'));
     //Recuperation de tous les non Lu
     $tpl->assign('unread',$feedManager->countUnreadEvents());
     //recuperation de tous les flux
-    $allFeeds = $feedManager->getFeedsPerFolder();
+    $allFeeds = $feedManager->getFeedsPerFolder($myUser->getId());
     $tpl->assign('allFeeds',$allFeeds);
     //recuperation de tous les flux par dossier
     $tpl->assign('allFeedsPerFolder',$allFeeds['folderMap']);
@@ -121,7 +121,7 @@ switch($action){
         if(!$isAlwaysDisplayed) {
             break;
         }
-        $filter = array('unread'=>1);
+        $filter = array('unread'=>1,'feed'=>$feedManager->getFeedsIdsFromIdMap($allFeeds['idMap']));
         if($optionFeedIsVerbose) {
             $numberOfItem = $eventManager->rowCount($filter);
         } else {
