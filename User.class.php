@@ -114,6 +114,16 @@ class User extends MysqlEntity{
         return true;
     }
 
+    public function getUserList() {
+        return $this->loadAllOnlyColumn(
+            '`id`, `login`',
+            array('id' => 1),
+            '`id` ASC',
+            null,
+            '>='
+        );
+    }
+
     public function remove($userId) {
         require_once('Logger.class.php');
         $logger = new Logger('settings');

@@ -80,5 +80,6 @@
  "YOU_MUST_BE_CONNECTED_ACTION":"Vous devez être connecté pour effectuer cette action.",
 
  "USERS": "Utilisateurs",
- "USER_ADD": "Ajouter un utilisateur"
+ "USER_ADD": "Ajouter un utilisateur",
+ "USER_LIST": "Liste des utilisateurs"
 }

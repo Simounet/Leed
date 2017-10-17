@@ -45,6 +45,7 @@ $tpl->assign('articleDisplayHomeSort', $configurationManager->get('articleDispla
 $tpl->assign('articleDisplayFolderSort', $configurationManager->get('articleDisplayFolderSort'));
 $tpl->assign('articleDisplayMode', $configurationManager->get('articleDisplayMode'));
 $tpl->assign('optionFeedIsVerbose', $configurationManager->get('optionFeedIsVerbose'));
+$tpl->assign('userList', $userManager->getUserList());
 
 $tpl->assign('otpEnabled', $configurationManager->get('otpEnabled'));
 
