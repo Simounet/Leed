@@ -125,6 +125,9 @@ class User extends MysqlEntity{
     }
 
     public function remove($userId) {
+        if((int) $userId === 1) {
+            return false;
+        }
         require_once('Logger.class.php');
         $logger = new Logger('settings');
         if(empty($userId)) {
