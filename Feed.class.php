@@ -8,12 +8,13 @@
 
 class Feed extends MysqlEntity{
 
-    protected $id,$name,$url,$events=array(),$description,$website,$folder,$lastupdate,$isverbose,$lastSyncInError;
+    protected $id,$name,$userid,$url,$events=array(),$description,$website,$folder,$lastupdate,$isverbose,$lastSyncInError;
     protected $TABLE_NAME = 'feed';
     protected $object_fields =
     array(
         'id'=>'key',
         'name'=>'string',
+        'userid'=>'integer',
         'description'=>'longstring',
         'website'=>'longstring',
         'url'=>'longstring',
@@ -248,6 +249,13 @@ class Feed extends MysqlEntity{
         $this->name = $name;
     }
 
+    function getUserid(){
+        return $this->userid;
+    }
+
+    function setUserid($userid){
+        $this->userid = $userid;
+    }
 
     function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false){
         $filter['feed'] = $this->getId();

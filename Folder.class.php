@@ -8,12 +8,13 @@
 
 class Folder extends MysqlEntity{
 
-    protected $id,$name,$parent,$isopen;
+    protected $id,$name,$userid,$parent,$isopen;
     protected $TABLE_NAME = 'folder';
     protected $object_fields =
     array(
         'id'=>'key',
         'name'=>'string',
+        'userid'=>'integer',
         'parent'=>'integer',
         'isopen'=>'integer'
     );
@@ -86,6 +87,14 @@ class Folder extends MysqlEntity{
 
     function setName($name){
         $this->name = $name;
+    }
+
+    function getUserid(){
+        return $this->userid;
+    }
+
+    function setUserid($userid){
+        $this->userid = $userid;
     }
 
     function getParent(){
