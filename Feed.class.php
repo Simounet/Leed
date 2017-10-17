@@ -325,8 +325,8 @@ class Feed extends MysqlEntity{
     }
 
     /** @returns vrai si l'url n'est pas déjà connue .*/
-    function notRegistered() {
-        return $this->rowCount(array('url' => $this->url)) == 0;
+    function notRegistered($userId) {
+        return $this->rowCount(array('userid' => $userId),array('url' => $this->url)) == 0;
     }
 
     public function synchronize($feeds, $syncTypeStr, $commandLine, $configurationManager, $start) {

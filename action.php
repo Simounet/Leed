@@ -60,7 +60,7 @@ switch ($action){
             $syncTypeStr = _t('SYNCHRONISATION_TYPE').' : '._t('GRADUATE_SYNCHRONISATION');
         }else{
             // sélectionne tous les flux, triés par le nom
-            $feeds = $feedManager->populate('name');
+            $feeds = $feedManager->loadAllOnlyColumn('*',array('userid' => $myUser->getId()), 'name');
             $syncTypeStr = _t('SYNCHRONISATION_TYPE').' : '._t('FULL_SYNCHRONISATION');
         }
 
@@ -228,7 +228,7 @@ switch ($action){
 
     case 'changeFolderState':
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
-        $folderManager->change(array('isopen'=>$_['isopen']),array('id'=>$_['id']));
+        $folderManager->change(array('isopen'=>$_['isopen']),array('userid'=>$myUser->getId(), 'id'=>$_['id']));
     break;
 
     case 'importFeed':
@@ -300,11 +300,12 @@ switch ($action){
         if(!isset($_['newUrl'])) break;
         $newFeed = new Feed();
         $newFeed->setUrl(Functions::clean_url($_['newUrl']));
-        if ($newFeed->notRegistered()) {
+        if ($newFeed->notRegistered($myUser->getId())) {
             $newFeed->getInfos();
             $newFeed->setFolder(
                 (isset($_['newUrlCategory'])?$_['newUrlCategory']:1)
             );
+            $newFeed->setUserid($myUser->getId());
             $newFeed->save();
             $enableCache = ($configurationManager->get('synchronisationEnableCache')=='')?0:$configurationManager->get('synchronisationEnableCache');
             $forceFeed = ($configurationManager->get('synchronisationForceFeed')=='')?0:$configurationManager->get('synchronisationForceFeed');
@@ -321,7 +322,7 @@ switch ($action){
     case 'changeFeedFolder':
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         if(isset($_['feed'])){
-            $feedManager->change(array('folder'=>$_['folder']),array('id'=>$_['feed']));
+            $feedManager->change(array('folder'=>$_['folder']),array('id'=>$_['feed'], 'userid' => $myUser->getId()));
         }
         header('location: ./settings.php');
     break;
@@ -329,8 +330,9 @@ switch ($action){
     case 'removeFeed':
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         if(isset($_GET['id'])){
-            $feedManager->delete(array('id'=>$_['id']));
-            $eventManager->delete(array('feed'=>$_['id']));
+            $feedManager->delete(array('id'=>$_['id'], 'userid' => $myUser->getId()));
+            //@TODO Multiuser
+            //$eventManager->delete(array('feed'=>$_['id']));
             Plugin::callHook("action_after_removeFeed", array($_['id']));
         }
         header('location: ./settings.php');
@@ -342,6 +344,7 @@ switch ($action){
             $folder = new Folder();
             if($folder->rowCount(array('name'=>$_['newFolder']))==0){
                 $folder->setParent(-1);
+                $folder->setUserid($myUser->getId());
                 $folder->setIsopen(0);
                 $folder->setName($_['newFolder']);
                 $folder->save();
@@ -369,8 +372,9 @@ switch ($action){
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         if(isset($_['id']) && is_numeric($_['id']) && $_['id']>0){
             $eventManager->customQuery('DELETE FROM `'.MYSQL_PREFIX.'event` WHERE `'.MYSQL_PREFIX.'event`.`feed` in (SELECT `'.MYSQL_PREFIX.'feed`.`id` FROM `'.MYSQL_PREFIX.'feed` WHERE `'.MYSQL_PREFIX.'feed`.`folder` =\''.intval($_['id']).'\') ;');
-            $feedManager->delete(array('folder'=>$_['id']));
-            $folderManager->delete(array('id'=>$_['id']));
+            //@TODO Multiuser
+            //$feedManager->delete(array('folder'=>$_['id']));
+            $folderManager->delete(array('id'=>$_['id'], 'userid'=>$myUser->getId()));
         }
         header('location: ./settings.php');
     break;

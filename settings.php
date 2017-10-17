@@ -33,8 +33,8 @@ $tpl->assign('themeList',$themeList);
 $tpl->assign('currentTheme',$configurationManager->get('theme'));
 
 //autres variables de configuration
-$tpl->assign('feeds',$feedManager->populate('name'));
-$tpl->assign('folders',$folderManager->populate('name'));
+$tpl->assign('feeds',$feedManager->loadAllOnlyColumn('*',array('userid' => $myUser->getId()), 'name'));
+$tpl->assign('folders',$folderManager->loadAllOnlyColumn('*',array('userid' => $myUser->getId()), 'name'));
 $tpl->assign('synchronisationType',$configurationManager->get('synchronisationType'));
 $tpl->assign('synchronisationEnableCache',$configurationManager->get('synchronisationEnableCache'));
 $tpl->assign('synchronisationForceFeed',$configurationManager->get('synchronisationForceFeed'));
