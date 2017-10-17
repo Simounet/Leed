@@ -108,7 +108,7 @@ class User extends MysqlEntity{
         $this->setLogin($login);
         $this->setPassword($password, $salt);
         $this->save();
-        $this->createSideTables($login);
+        $this->createSideTables();
         $logger->appendLogs(_t("USER_ADD_OK"). ' '.$login);
         $logger->save();
         return true;
@@ -139,7 +139,6 @@ class User extends MysqlEntity{
             return false;
         }
         $this->setLogin($user->getLogin());
-        $this->deleteSideTables();
         $this->delete(array('id' => $userId));
         $logger->appendLogs(_t("USER_DEL_OK").$user->getLogin());
         $logger->save();
@@ -147,27 +146,16 @@ class User extends MysqlEntity{
     }
 
     protected function createSideTables() {
-        $this->manageSideTables();
-    }
-
-    protected function deleteSideTables() {
-        $this->manageSideTables('remove');
-    }
-
-    protected function manageSideTables($action = 'add') {
-        $actionMethod = $action === 'add' ? 'create' : 'destroy';
         $feedManager = new Feed();
-        $feedManager->$actionMethod();
+        $feedManager->create();
         $eventManager = new Event();
-        $eventManager->$actionMethod();
+        $eventManager->create();
         $folderManager = new Folder();
-        $folderManager->$actionMethod();
-        if($action === 'add' && $folderManager->rowCount() === '0') {
-            $folderManager->setName(_t('GENERAL_FOLDER'));
-            $folderManager->setParent(-1);
-            $folderManager->setIsopen(1);
-            $folderManager->save();
-        }
+        $folderManager->create();
+        $folderManager->setName(_t('GENERAL_FOLDER'));
+        $folderManager->setParent(-1);
+        $folderManager->setIsopen(1);
+        $folderManager->save();
     }
 
     static function existAuthToken($auth=null){
