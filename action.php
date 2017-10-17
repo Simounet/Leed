@@ -24,6 +24,7 @@ Plugin::callHook("action_pre_case", array(&$_,$myUser));
 switch ($action){
     case 'commandLine':
     case 'synchronize':
+        //@TODO Multiuser
         require_once("SimplePie.class.php");
         $syncCode = $configurationManager->get('synchronisationCode');
         $syncGradCount = $configurationManager->get('syncGradCount');
@@ -71,6 +72,7 @@ switch ($action){
 
 
     case 'readAll':
+        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         $whereClause = array();
         $whereClause['unread'] = '1';
@@ -83,6 +85,7 @@ switch ($action){
     break;
 
     case 'readFolder':
+        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
 
         $feeds = $feedManager->loadAllOnlyColumn('id',array('folder'=>$_['folder']));
@@ -100,6 +103,7 @@ switch ($action){
     break;
 
     case 'updateConfiguration':
+        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
 
             //Ajout des préférences et réglages
@@ -167,6 +171,7 @@ switch ($action){
 
 
     case 'exportFeed':
+        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
             /*********************/
         /** Export **/
@@ -200,6 +205,7 @@ switch ($action){
 
 
     case 'importForm':
+        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         echo '<html style="height:auto;"><link rel="stylesheet" href="templates/'.$theme.'/css/style.css">
                 <body style="height:auto;">
@@ -214,6 +220,7 @@ switch ($action){
     break;
 
     case 'synchronizeForm':
+        //@TODO Multiuser
      if(isset($myUser) && $myUser!=false){
         echo '<link rel="stylesheet" href="templates/'.$theme.'/css/style.css">
                 <a class="button" href="action.php?action=synchronize">'._t('SYNCHRONIZE_NOW').'</a>
@@ -232,6 +239,7 @@ switch ($action){
     break;
 
     case 'importFeed':
+        //@TODO Multiuser
         // On ne devrait pas mettre de style ici.
         echo "<html>
             <style>
@@ -380,6 +388,7 @@ switch ($action){
     break;
 
     case 'readContent':
+        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -394,6 +403,7 @@ switch ($action){
     break;
 
     case 'unreadContent':
+        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -408,6 +418,7 @@ switch ($action){
     break;
 
     case 'addFavorite':
+        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -419,6 +430,7 @@ switch ($action){
     break;
 
     case 'removeFavorite':
+        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -484,6 +496,7 @@ switch ($action){
     break;
 
     case 'changePluginState':
+        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
 
         if($_['state']=='0'){
@@ -506,6 +519,7 @@ switch ($action){
     break;
 
     case 'displayOnlyUnreadFeedFolder':
+        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -517,6 +531,7 @@ switch ($action){
     break;
 
     case 'displayFeedIsVerbose':
+        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -532,6 +547,7 @@ switch ($action){
         break;
 
     case 'optionFeedIsVerbose':
+        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -547,6 +563,7 @@ switch ($action){
         break;
 
     case 'articleDisplayMode':
+        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
