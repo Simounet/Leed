@@ -113,7 +113,17 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
         }
         $userManager->create();
         $userManager->add($this->options['user']['login'], $this->options['user']['password'], $this->salt, $this->logger);
+        $this->createSideTables();
         $_SESSION['currentUser'] = serialize($userManager->get($this->options['user']['login']));
+    }
+
+    protected function createSideTables() {
+        $feedManager = new Feed();
+        $feedManager->create();
+        $eventManager = new Event();
+        $eventManager->create();
+        $folderManager = new Folder();
+        $folderManager->create();
     }
 
     protected function checkLoginPassword() {

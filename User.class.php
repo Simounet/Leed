@@ -108,7 +108,7 @@ class User extends MysqlEntity{
         $this->setLogin($login);
         $this->setPassword($password, $salt);
         $this->save();
-        $this->createSideTables();
+        $this->createDefaultFolder();
         $logger->appendLogs(_t("USER_ADD_OK"). ' '.$login);
         $logger->save();
         return true;
@@ -142,20 +142,32 @@ class User extends MysqlEntity{
             return false;
         }
         $this->setLogin($user->getLogin());
+        $this->cleanSideTables($userId);
         $this->delete(array('id' => $userId));
         $logger->appendLogs(_t("USER_DEL_OK").$user->getLogin());
         $logger->save();
         return true;
     }
 
-    protected function createSideTables() {
-        $feedManager = new Feed();
-        $feedManager->create();
-        $eventManager = new Event();
-        $eventManager->create();
+    protected function cleanSideTables($userId) {
+        $this->cleanFolder($userId);
+        $this->cleanFeed($userId);
+    }
+
+    protected function cleanFolder($userId) {
         $folderManager = new Folder();
-        $folderManager->create();
+        $folderManager->delete(array('userid' => $userId));
+    }
+
+    protected function cleanFeed($userId) {
+        $feedManager = new Feed();
+        $feedManager->delete(array('userid' => $userId));
+    }
+
+    protected function createDefaultFolder() {
+        $folderManager = new Folder();
         $folderManager->setName(_t('GENERAL_FOLDER'));
+        $folderManager->setUserid($this->getId());
         $folderManager->setParent(-1);
         $folderManager->setIsopen(1);
         $folderManager->save();
