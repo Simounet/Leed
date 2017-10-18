@@ -333,15 +333,7 @@ class MysqlEntity
     */
     public function rowCount($columns=null)
     {
-        $whereClause ='';
-        if($columns!=null){
-            $whereClause = ' WHERE ';
-            $i=false;
-            foreach($columns as $column=>$value){
-                if($i){$whereClause .=' AND ';}else{$i=true;}
-                $whereClause .= '`'.$column.'`="'.$this->secure($value, $column).'"';
-            }
-        }
+        $whereClause = $this->getWhereClause($columns);
         $query = 'SELECT COUNT(1) FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'`'.$whereClause;
         if($this->debug)echo '<hr>'.get_class($this).' ('.__METHOD__ .') : Requete --> '.$query.'<br>'.$this->dbconnector->connection->error;
         $myQuery = $this->customQuery($query);
@@ -359,14 +351,8 @@ class MysqlEntity
     * @return Aucun retour
     */
     public function delete($columns,$operation='='){
-        $whereClause = '';
-
-        $i=false;
-        foreach($columns as $column=>$value){
-            if($i){$whereClause .=' AND ';}else{$i=true;}
-            $whereClause .= '`'.$column.'`'.$operation.'"'.$this->secure($value, $column).'"';
-        }
-        $query = 'DELETE FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` WHERE '.$whereClause.' ;';
+        $whereClause = $this->getWhereClause($columns, $operation);
+        $query = 'DELETE FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` '.$whereClause.' ;';
         if($this->debug)echo '<hr>'.get_class($this).' ('.__METHOD__ .') : Requete --> '.$query.'<br>'.$this->dbconnector->connection->error;
         $this->customQuery($query);
 
@@ -459,7 +445,7 @@ class MysqlEntity
     * @param <str> Opérateur (ex. : '=', '!=', '<', '<=', '>', '>=')
     * @return <str> WHERE...
     */
-    protected function getWhereClause($columns,$operation) {
+    protected function getWhereClause($columns,$operation = '=') {
         $whereClause = '';
         $operation_default = $operation;
 
