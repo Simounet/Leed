@@ -58,7 +58,7 @@ $tpl->assign('articlePerPages',$articlePerPages);
 $tpl->assign('displayOnlyUnreadFeedFolder',$displayOnlyUnreadFeedFolder);
 $tpl->assign('displayOnlyUnreadFeedFolder_reverse',$displayOnlyUnreadFeedFolder_reverse);
 
-$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`feed`,';
+$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`url`,';
 if($articleDisplayMode=='summary') $target .= '`'.MYSQL_PREFIX.'event`.`description`,';
 if($articleDisplayMode=='content') $target .= '`'.MYSQL_PREFIX.'event`.`content`,';
 if($articleDisplayLink) $target .= '`'.MYSQL_PREFIX.'event`.`link`,';
@@ -77,7 +77,7 @@ switch($action){
     case 'selectedFeed':
         $currentFeed = $feedManager->getById($_['feed']);
         $tpl->assign('currentFeed',$currentFeed);
-        $numberOfItem = $eventManager->rowCount(array('feed'=>$currentFeed->getId()));
+        $numberOfItem = $eventManager->rowCount(array('url'=>$currentFeed->getWebsite()));
         $allowedOrder = array('date'=>'pubdate DESC','older'=>'pubdate','unread'=>'unread DESC,pubdate DESC');
         $order = (isset($_['order'])?$allowedOrder[$_['order']]:$allowedOrder['unread']);
         $page = (isset($_['page'])?$_['page']:1);
@@ -121,7 +121,7 @@ switch($action){
         if(!$isAlwaysDisplayed) {
             break;
         }
-        $filter = array('unread'=>1,'feed'=>$feedManager->getFeedsIdsFromIdMap($allFeeds['idMap']));
+        $filter = array('unread'=>1,'url'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']));
         if($optionFeedIsVerbose) {
             $numberOfItem = $eventManager->rowCount($filter);
         } else {

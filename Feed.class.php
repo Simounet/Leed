@@ -105,7 +105,7 @@ class Feed extends MysqlEntity{
             if ($iEvents++>=100) break;
 
             // Si le guid existe déjà, on évite de le reparcourir.
-            $alreadyParsed = $eventManager->load(array('guid'=>$item->get_id(), 'feed'=>$this->id));
+            $alreadyParsed = $eventManager->load(array('guid'=>$item->get_id(), 'url'=>$this->url));
             if (isset($alreadyParsed)&&($alreadyParsed!=false)) {
                 $events[]=$alreadyParsed->getId();
                 continue;
@@ -128,7 +128,7 @@ class Feed extends MysqlEntity{
             );
             $event->setLink($item->get_permalink());
 
-            $event->setFeed($this->id);
+            $event->setUrl($this->url);
             $event->setUnread(1); // inexistant, donc non-lu
             $enclosure = $this->getEnclosureHtml($item->get_enclosure());
             $event->setContent($item->get_content().$enclosure);
@@ -266,7 +266,7 @@ class Feed extends MysqlEntity{
 
     function countUnreadEvents(){
         $unreads = array();
-        $results = Feed::customQuery("SELECT COUNT(`".MYSQL_PREFIX."event`.`id`), `".MYSQL_PREFIX."event`.`feed` FROM `".MYSQL_PREFIX."event` WHERE `".MYSQL_PREFIX."event`.`unread` = 1 GROUP BY `".MYSQL_PREFIX."event`.`feed`") ;
+        $results = Feed::customQuery("SELECT COUNT(`".MYSQL_PREFIX."event`.`id`), `".MYSQL_PREFIX."event`.`url` FROM `".MYSQL_PREFIX."event` WHERE `".MYSQL_PREFIX."event`.`unread` = 1 GROUP BY `".MYSQL_PREFIX."event`.`url`") ;
         if($results!=false){
             $total = 0;
             while($item = $results->fetch_array()){
@@ -296,7 +296,7 @@ class Feed extends MysqlEntity{
         if($results!=false){
             while($item = $results->fetch_array()){
                 $name = $item['name'];
-                $feedsIdMap[$item['id']]['name'] = $name;
+                $feedsIdMap[$item['url']]['name'] = $name;
 
 
                 $feedsFolderMap[$item['folder']][$item['id']]['id'] = $item['id'];
@@ -310,12 +310,14 @@ class Feed extends MysqlEntity{
         return $feeds;
     }
 
-    public function getFeedsIdsFromIdMap($idMap) {
-        $userFeeds = array();
-        foreach($idMap as $feedId => $feedName) {
-            $userFeeds[] = $feedId;
+    public function getUrlsFromFolderMap($folderMap) {
+        $urls = array();
+        foreach($folderMap as $folder) {
+            foreach($folder as $feed) {
+                $urls[] = $feed['url'];
+            }
         }
-        return $userFeeds;
+        return array_unique($urls);
     }
 
     function getFolder(){

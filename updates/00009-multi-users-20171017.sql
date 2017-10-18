@@ -10,3 +10,14 @@
 --######################################################################################################
 ALTER TABLE `##MYSQL_PREFIX##folder` ADD userid int(11) DEFAULT 1;
 ALTER TABLE `##MYSQL_PREFIX##feed` ADD userid int(11) DEFAULT 1;
+CREATE TABLE `##MYSQL_PREFIX##event_sub` (
+    userid int(11) NOT NULL,
+    eventid int(11) NOT NULL,
+    unread int(1) DEFAULT 1,
+    favorite int(1) DEFAULT 0,
+    INDEX(userid, eventid)
+) ENGINE=InnoDB;
+ALTER TABLE `##MYSQL_PREFIX##event` ADD url text NOT NULL;
+UPDATE `##MYSQL_PREFIX##event` ev LEFT JOIN `##MYSQL_PREFIX##feed` fe ON ev.feed = fe.id SET ev.url=fe.url;
+ALTER TABLE `##MYSQL_PREFIX##event` DROP feed;
+CREATE INDEX urlindex ON `##MYSQL_PREFIX##event` (url(100));
