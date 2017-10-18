@@ -40,6 +40,7 @@ class_exists('MysqlEntity') or require_once('MysqlEntity.class.php');
 class_exists('Update') or require_once('Update.class.php');
 class_exists('Feed') or require_once('Feed.class.php');
 class_exists('Event') or require_once('Event.class.php');
+class_exists('EventSub') or require_once('EventSub.class.php');
 class_exists('User') or require_once('User.class.php');
 class_exists('Folder') or require_once('Folder.class.php');
 class_exists('Configuration') or require_once('Configuration.class.php');

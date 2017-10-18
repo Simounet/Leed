@@ -145,6 +145,7 @@ class Feed extends MysqlEntity{
 
             $event->setCategory($item->get_category());
             $event->save();
+            $this->eventSubSave($event->getId());
             $nbEvents++;
         }
 
@@ -157,6 +158,19 @@ class Feed extends MysqlEntity{
 
         $this->save();
         return true;
+    }
+
+    protected function eventSubSave($eventId) {
+        if($eventId == 0) {
+            return false;
+        }
+        $feedSubscribed = $this->loadAllOnlyColumn('userid', array('url' => $this->url));
+        $userIds = array();
+        foreach($feedSubscribed as $feed) {
+            $userIds[] = $feed->getUserid();
+        }
+        $eventSub = new EventSub();
+        $eventSub->saveEvents($eventId, $userIds);
     }
 
     protected function getEnclosureHtml($enclosure) {
