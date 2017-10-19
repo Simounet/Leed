@@ -121,7 +121,7 @@ switch($action){
         if(!$isAlwaysDisplayed) {
             break;
         }
-        $filter = array('unread'=>1,'url'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']));
+        $filter = array('url'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']), 'unread'=>1);
         if($optionFeedIsVerbose) {
             $numberOfItem = $eventManager->rowCount($filter);
         } else {
