@@ -425,14 +425,19 @@ class MysqlEntity
     * @return <array> 0: opérateur, 1: valeur
     */
     protected function getCustomQueryOperator($operation_default, $value) {
-        $valid_operators = array('=','!=','<','<=','>','>=');
+        $validOpterators = array('=','!=','<','<=','>','>=');
         $operation = $operation_default;
 
         // Modification de l'opération si contenu dans la valeur du filtre
-        $value_list = explode(' ', $value);
-        if((count($value_list) > 0) && (in_array($value_list[0],$valid_operators))) {
-            $operation = $value_list[0];
-            $value = $value_list[1];
+        $valueList = explode(' ', $value);
+        if(count($valueList) > 0) {
+            if($valueList[0] === 'SELECT') {
+                $operation = 'IN';
+                $value = '(' . $value . ')';
+            } elseif(in_array($valueList[0],$validOpterators)) {
+                $operation = $valueList[0];
+                $value = $valueList[1];
+            }
         }
 
         return array($operation, $value);
@@ -459,7 +464,12 @@ class MysqlEntity
                     $customQueryOperator = $this->getCustomQueryOperator($operation_default, $val);
                     $condition = count($values) > 1 ? 'OR' : 'AND';
                     if($i){$whereClause .=' ' . $condition . ' ';}else{$i=true;}
-                    $whereClause .= '`'.$column.'`'.$customQueryOperator[0].'"'.$this->secure($customQueryOperator[1], $column).'"';
+                    $whereClause .= '`'.$column.'`';
+                    if($customQueryOperator[0] === 'IN') {
+                        $whereClause .= ' ' . $customQueryOperator[0] . ' ' . $customQueryOperator[1];
+                    } else {
+                        $whereClause .= $customQueryOperator[0] . '"'.$this->secure($customQueryOperator[1], $column).'"';
+                    }
                 }
             }
         }

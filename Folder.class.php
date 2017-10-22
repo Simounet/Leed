@@ -20,7 +20,15 @@ class Folder extends MysqlEntity{
     );
 
     function unreadCount(){
-        $results = $this->customQuery('SELECT COUNT(`'.MYSQL_PREFIX.'event`.`id`) FROM `'.MYSQL_PREFIX.'event` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feed` = `'.MYSQL_PREFIX.'feed`.`id`) WHERE `'.MYSQL_PREFIX.'event`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`folder` = '.$this->getId());
+        $results = $this->customQuery(
+            'SELECT COUNT(`'.MYSQL_PREFIX.'event`.`id`) ' .
+            'FROM `'.MYSQL_PREFIX.'event` ' .
+            'INNER JOIN `'.MYSQL_PREFIX.'event_sub` '.
+            'ON (`'.MYSQL_PREFIX.'event`.`id` = `'.MYSQL_PREFIX.'event_sub`.`eventid`) '.
+            'INNER JOIN `'.MYSQL_PREFIX.'feed` '.
+            'ON (`'.MYSQL_PREFIX.'event_sub`.`feedid` = `'.MYSQL_PREFIX.'feed`.`id`) '.
+            'WHERE `'.MYSQL_PREFIX.'event`.`unread`=1 ' .
+            'AND `'.MYSQL_PREFIX.'feed`.`folder` = '.$this->getId());
         $number = $results->fetch_array();
         return $number[0];
     }
@@ -34,11 +42,13 @@ class Folder extends MysqlEntity{
         $whereClause = $this->getWhereClause($filter,'=');
 
         $objects = array();
-        $query = 
+        $query =
             'SELECT '.$columns.' '.
             'FROM `'.MYSQL_PREFIX.'event` '.
+            'INNER JOIN `'.MYSQL_PREFIX.'event_sub` '.
+            'ON (`'.MYSQL_PREFIX.'event`.`id` = `'.MYSQL_PREFIX.'event_sub`.`eventid`) '.
             'INNER JOIN `'.MYSQL_PREFIX.'feed` '.
-            'ON (`'.MYSQL_PREFIX.'event`.`feed` = `'.MYSQL_PREFIX.'feed`.`id`) '.
+            'ON (`'.MYSQL_PREFIX.'event_sub`.`feedid` = `'.MYSQL_PREFIX.'feed`.`id`) '.
             $whereClause.' '.
             'ORDER BY '.$order.' '.
             'LIMIT '.$start.','.$limit;

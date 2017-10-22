@@ -164,13 +164,13 @@ class Feed extends MysqlEntity{
         if($eventId == 0) {
             return false;
         }
-        $feedSubscribed = $this->loadAllOnlyColumn('userid', array('url' => $this->url));
+        $feedSubscribed = $this->loadAllOnlyColumn('userid, id', array('url' => $this->url));
         $userIds = array();
         foreach($feedSubscribed as $feed) {
             $userIds[] = $feed->getUserid();
         }
         $eventSub = new EventSub();
-        $eventSub->saveEvents($eventId, $userIds);
+        $eventSub->saveEventsSub($feed->getId(), $eventId, $userIds);
     }
 
     protected function getEnclosureHtml($enclosure) {
@@ -271,8 +271,9 @@ class Feed extends MysqlEntity{
         $this->userid = $userid;
     }
 
-    function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false){
-        $filter['feed'] = $this->getId();
+    function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false, $userId = 0){
+        $eventSub = new EventSub();
+        $filter['id'] = $eventSub->setIdFilter($filter, $userId);
         $eventManager = new Event();
         $events = $eventManager->loadAllOnlyColumn($columns,$filter,$order,$start.','.$limit);
         return $events;

@@ -12,6 +12,7 @@ class EventSub extends MysqlEntity{
     protected $object_fields =
     array(
         'userid'=>'integer',
+        'feedid'=>'integer',
         'eventid'=>'integer',
         'unread'=>'integer',
         'favorite'=>'integer'
@@ -20,6 +21,7 @@ class EventSub extends MysqlEntity{
     protected $object_fields_index =
     array(
         'userid'=>'index',
+        'feedid'=>'index',
         'eventid'=>'index'
     );
 
@@ -29,13 +31,17 @@ class EventSub extends MysqlEntity{
         parent::__construct();
     }
 
-    public function saveEvents($eventId, $userIds) {
+    public function saveEventsSub($feedId, $eventId, $userIds) {
         $queryValues = array();
         foreach($userIds as $userId) {
-            $queryValues[] = '(' . $userId . ', ' . $eventId . ')';
+            $queryValues[] = '(' . $userId . ', ' . $feedId . ', ' . $eventId . ')';
         }
-        $query = 'INSERT INTO `' . MYSQL_PREFIX . $this->TABLE_NAME . '` (userid, eventid) VALUES ' . implode( ',', $queryValues ) . ';';
+        $query = 'INSERT INTO `' . MYSQL_PREFIX . $this->TABLE_NAME . '` (userid, feedid, eventid) VALUES ' . implode( ',', $queryValues ) . ';';
         $this->customQuery($query);
+    }
+
+    public function setIdFilter($filter, $userId) {
+        return array('IN' => 'SELECT eventid FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` WHERE userid=' . $userId);
     }
 
     function getUserid(){
