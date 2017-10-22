@@ -18,7 +18,7 @@ CREATE TABLE `##MYSQL_PREFIX##event_sub` (
     favorite int(1) DEFAULT 0,
     INDEX(userid, feedid, eventid)
 ) ENGINE=InnoDB;
-ALTER TABLE `##MYSQL_PREFIX##event` ADD url text NOT NULL;
-UPDATE `##MYSQL_PREFIX##event` ev LEFT JOIN `##MYSQL_PREFIX##feed` fe ON ev.feed = fe.id SET ev.url=fe.url;
+ALTER TABLE `##MYSQL_PREFIX##event` ADD feedurl text NOT NULL;
+UPDATE `##MYSQL_PREFIX##event` ev LEFT JOIN `##MYSQL_PREFIX##feed` fe ON ev.feed = fe.id SET ev.feedurl=fe.url;
 ALTER TABLE `##MYSQL_PREFIX##event` DROP feed;
 CREATE INDEX urlindex ON `##MYSQL_PREFIX##event` (url(100));

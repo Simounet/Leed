@@ -8,7 +8,7 @@
 
 class Event extends MysqlEntity{
 
-    protected $id,$title,$guid,$content,$description,$pudate,$link,$url,$category,$creator,$unread,$favorite;
+    protected $id,$title,$guid,$content,$description,$pudate,$link,$feedurl,$category,$creator,$unread,$favorite;
     protected $TABLE_NAME = 'event';
     protected $object_fields =
     array(
@@ -20,7 +20,7 @@ class Event extends MysqlEntity{
         'description'=>'longstring',
         'link'=>'longstring',
         'unread'=>'integer',
-        'url'=>'longstring',
+        'feedurl'=>'longstring',
         'favorite'=>'integer',
         'pubdate'=>'integer',
         'syncId'=>'integer',
@@ -28,7 +28,7 @@ class Event extends MysqlEntity{
 
     protected $object_fields_index =
     array(
-        'url'=>'index',
+        'feedurl'=>'index',
         'unread'=>'index',
         'favorite'=>'index'
     );
@@ -49,7 +49,7 @@ class Event extends MysqlEntity{
 
     function getEventCountPerFolder(){
         $events = array();
-        $results = $this->customQuery('SELECT COUNT(`'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`id`),`'.MYSQL_PREFIX.'feed`.`folder` FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`url` = `'.MYSQL_PREFIX.'feed`.`url`) WHERE `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 GROUP BY `'.MYSQL_PREFIX.'feed`.`folder`');
+        $results = $this->customQuery('SELECT COUNT(`'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`id`),`'.MYSQL_PREFIX.'feed`.`folder` FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) WHERE `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 GROUP BY `'.MYSQL_PREFIX.'feed`.`folder`');
         while($item = $results->fetch_array()){
             $events[$item[1]] = intval($item[0]);
         }
@@ -58,7 +58,7 @@ class Event extends MysqlEntity{
     }
 
     function getEventCountNotVerboseFeed(){
-        $results = $this->customQuery('SELECT COUNT(1) FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`url` = `'.MYSQL_PREFIX.'feed`.`url`) WHERE `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose`=0');
+        $results = $this->customQuery('SELECT COUNT(1) FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) WHERE `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose`=0');
         while($item = $results->fetch_array()){
             $nbitem =  $item[0];
         }
@@ -69,7 +69,7 @@ class Event extends MysqlEntity{
     function getEventsNotVerboseFeed($start=0,$limit=10000,$order,$columns='*'){
         $eventManager = new Event();
         $objects = array();
-        $results = $this->customQuery('SELECT '.$columns.' FROM `'.MYSQL_PREFIX.'event` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`url` = `'.MYSQL_PREFIX.'feed`.`url`) WHERE `'.MYSQL_PREFIX.'event`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose` = 0 ORDER BY '.$order.' LIMIT '.$start.','.$limit);
+        $results = $this->customQuery('SELECT '.$columns.' FROM `'.MYSQL_PREFIX.'event` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) WHERE `'.MYSQL_PREFIX.'event`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose` = 0 ORDER BY '.$order.' LIMIT '.$start.','.$limit);
         if($results!=false){
             while($item = $results->fetch_array()){
                 $object = new Event();
@@ -194,11 +194,11 @@ class Event extends MysqlEntity{
     function setUnread($unread){
         $this->unread = $unread;
     }
-    function setUrl($url){
-        $this->url = $url;
+    function setFeedUrl($feedUrl){
+        $this->feedurl = $feedUrl;
     }
-    function getUrl(){
-        return $this->url;
+    function getFeedUrl(){
+        return $this->feedurl;
     }
     function setFavorite($favorite){
         $this->favorite = $favorite;

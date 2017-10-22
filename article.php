@@ -39,7 +39,7 @@ if(isset($_['hightlighted'])) {
 
 $tpl->assign('time',$_SERVER['REQUEST_TIME']);
 
-$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`url`,';
+$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
 if($articleDisplayMode=='summary') $target .= '`'.MYSQL_PREFIX.'event`.`description`,';
 if($articleDisplayMode=='content') $target .= '`'.MYSQL_PREFIX.'event`.`content`,';
 if($articleDisplayLink) $target .= '`'.MYSQL_PREFIX.'event`.`link`,';
@@ -53,7 +53,7 @@ if ($articleConf['startArticle'] < 0) $articleConf['startArticle']=0;
 $action = $_['action'];
 $tpl->assign('action',$action);
 
-$filter = array('url'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']));
+$filter = array('feedurl'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']));
 Plugin::callHook("article_pre_action", array(&$_,&$filter,&$articleConf));
 switch($action){
     /* AFFICHAGE DES EVENEMENTS D'UN FLUX EN PARTICULIER */
