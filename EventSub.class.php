@@ -40,6 +40,10 @@ class EventSub extends MysqlEntity{
         $this->customQuery($query);
     }
 
+    public function getEventRelationFilter() {
+        return '`' . MYSQL_PREFIX . 'event_sub` ON `' . MYSQL_PREFIX . 'event`.`id` = `' . MYSQL_PREFIX . 'event_sub`.`eventid`';
+    }
+
     function getUserid(){
         return $this->userid;
     }

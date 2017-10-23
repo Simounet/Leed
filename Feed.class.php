@@ -271,8 +271,15 @@ class Feed extends MysqlEntity{
         $this->userid = $userid;
     }
 
+    public function rowCount($filter=array()) {
+        $eventSubManager = new EventSub();
+        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
+        parent::rowCount($filter);
+    }
+
     function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false, $eventSubFilters=array()){
-        $filter['LEFTJOIN'] = '`' . MYSQL_PREFIX . 'event_sub` ON `' . MYSQL_PREFIX . 'event`.`id` = `' . MYSQL_PREFIX . 'event_sub`.`eventid`';
+        $eventSubManager = new EventSub();
+        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         if(isset($eventSubFilters['userid'])) {
             $filter[MYSQL_PREFIX.'event_sub.userid'] = $eventSubFilters['userid'];
         }
