@@ -127,7 +127,7 @@ switch($action){
         if($optionFeedIsVerbose) {
             $numberOfItem = $eventManager->rowCount($filter);
         } else {
-            $numberOfItem = $eventManager->getEventCountNotVerboseFeed();
+            $numberOfItem = $eventManager->getEventCountNotVerboseFeed($myUser->getId());
         }
         $page = (isset($_['page'])?$_['page']:1);
         $pages = ($articlePerPages>0?ceil($numberOfItem/$articlePerPages):1);
@@ -136,7 +136,7 @@ switch($action){
         if($optionFeedIsVerbose) {
             $events = $eventManager->loadAllOnlyColumn($target,$filter,$order,$startArticle.','.$articlePerPages);
         } else {
-            $events = $eventManager->getEventsNotVerboseFeed($startArticle,$articlePerPages,$order,$target);
+            $events = $eventManager->getEventsNotVerboseFeed($startArticle,$articlePerPages,$order,$target,$myUser->getId());
         }
         $tpl->assign('numberOfItem',$numberOfItem);
 
