@@ -430,17 +430,25 @@ class MysqlEntity
 
         // Modification de l'opération si contenu dans la valeur du filtre
         $valueList = explode(' ', $value);
-        if(count($valueList) > 0) {
-            if($valueList[0] === 'SELECT') {
-                $operation = 'IN';
-                $value = '(' . $value . ')';
-            } elseif(in_array($valueList[0],$validOpterators)) {
-                $operation = $valueList[0];
-                $value = $valueList[1];
-            }
+        if(count($valueList) > 0 && in_array($valueList[0],$validOpterators)) {
+            $operation = $valueList[0];
+            $value = $valueList[1];
         }
 
         return array($operation, $value);
+    }
+
+    protected function getColumn($name) {
+        $nameExploded = explode('.', $name);
+        $isForeign = count($nameExploded) > 1;
+        return $isForeign === true ? '`' . $nameExploded[0] . '`.`' . $nameExploded[1] . '`' : '`' . $nameExploded[0] . '`';
+    }
+
+    protected function getLeftJoin($filters = array()) {
+        if(array_key_exists('LEFTJOIN', $filters)) {
+            return ' LEFT JOIN ' . $filters['LEFTJOIN'] . ' ';
+        }
+        return false;
     }
 
     /**
@@ -450,26 +458,30 @@ class MysqlEntity
     * @param <str> Opérateur (ex. : '=', '!=', '<', '<=', '>', '>=')
     * @return <str> WHERE...
     */
-    protected function getWhereClause($columns,$operation = '=') {
+    protected function getWhereClause($filters,$operation = '=') {
         $whereClause = '';
         $operation_default = $operation;
 
-        if($columns!=null && sizeof($columns)!=0){
+        if($filters!=null && sizeof($filters)!=0){
+            $leftJoin = $this->getLeftJoin($filters);
+            if(is_string($leftJoin)) {
+                $whereClause .= $leftJoin;
+            }
             $whereClause .= ' WHERE ';
             $i = false;
-            foreach($columns as $column=>$value){
+            foreach($filters as $filter=>$value){
+                if($filter === 'LEFTJOIN') {
+                    continue;
+                }
                 //@TOFACTO
                 $values = !is_array($value) ? array($value) : $value;
                 foreach($values as $val) {
                     $customQueryOperator = $this->getCustomQueryOperator($operation_default, $val);
                     $condition = count($values) > 1 ? 'OR' : 'AND';
                     if($i){$whereClause .=' ' . $condition . ' ';}else{$i=true;}
-                    $whereClause .= '`'.$column.'`';
-                    if($customQueryOperator[0] === 'IN') {
-                        $whereClause .= ' ' . $customQueryOperator[0] . ' ' . $customQueryOperator[1];
-                    } else {
-                        $whereClause .= $customQueryOperator[0] . '"'.$this->secure($customQueryOperator[1], $column).'"';
-                    }
+                    $whereColumn = $this->getColumn($filter);
+                    $whereClause .= $whereColumn;
+                    $whereClause .= $customQueryOperator[0] . '"'.$this->secure($customQueryOperator[1], $whereColumn).'"';
                 }
             }
         }

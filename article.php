@@ -53,7 +53,6 @@ if ($articleConf['startArticle'] < 0) $articleConf['startArticle']=0;
 $action = $_['action'];
 $tpl->assign('action',$action);
 
-$filter = array('feedurl'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']));
 Plugin::callHook("article_pre_action", array(&$_,&$filter,&$articleConf));
 switch($action){
     /* AFFICHAGE DES EVENEMENTS D'UN FLUX EN PARTICULIER */
@@ -61,13 +60,13 @@ switch($action){
         $currentFeed = $feedManager->getById($_['feed']);
         $allowedOrder = array('date'=>'pubdate DESC','older'=>'pubdate','unread'=>'unread DESC,pubdate DESC');
         $order = (isset($_['order'])?$allowedOrder[$_['order']]:$allowedOrder['unread']);
-        $events = $currentFeed->getEvents($articleConf['startArticle'],$articleConf['articlePerPages'],$order,$target,$filter, $myUser->getId());
+        $events = $currentFeed->getEvents($articleConf['startArticle'],$articleConf['articlePerPages'],$order,$target,false, array('userid' => $myUser->getId(), 'feedid' => $_['feed']));
     break;
     /* AFFICHAGE DES EVENEMENTS D'UN DOSSIER EN PARTICULIER */
     case 'selectedFolder':
         $currentFolder = $folderManager->getById($_['folder']);
         if($articleDisplayFolderSort) {$order = '`'.MYSQL_PREFIX.'event`.`pubdate` desc';} else {$order = '`'.MYSQL_PREFIX.'event`.`pubdate` asc';}
-        $events = $currentFolder->getEvents($articleConf['startArticle'],$articleConf['articlePerPages'],$order,$target,$filter, $myUser->getId());
+        $events = $currentFolder->getEvents($articleConf['startArticle'],$articleConf['articlePerPages'],$order,$target);
     break;
     /* AFFICHAGE DES EVENEMENTS FAVORIS */
     case 'favorites':
@@ -77,6 +76,7 @@ switch($action){
     /* AFFICHAGE DES EVENEMENTS NON LUS (COMPORTEMENT PAR DEFAUT) */
     case 'unreadEvents':
     default:
+        $filter = array('feedurl'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']));
         $filter['unread'] = 1;
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {

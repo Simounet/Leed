@@ -271,9 +271,14 @@ class Feed extends MysqlEntity{
         $this->userid = $userid;
     }
 
-    function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false, $userId = 0){
-        $eventSub = new EventSub();
-        $filter['id'] = $eventSub->setIdFilter($filter, $userId);
+    function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false, $eventSubFilters=array()){
+        $filter['LEFTJOIN'] = '`' . MYSQL_PREFIX . 'event_sub` ON `' . MYSQL_PREFIX . 'event`.`id` = `' . MYSQL_PREFIX . 'event_sub`.`eventid`';
+        if(isset($eventSubFilters['userid'])) {
+            $filter[MYSQL_PREFIX.'event_sub.userid'] = $eventSubFilters['userid'];
+        }
+        if(isset($eventSubFilters['feedid'])) {
+            $filter[MYSQL_PREFIX.'event_sub.feedid'] = $eventSubFilters['feedid'];
+        }
         $eventManager = new Event();
         $events = $eventManager->loadAllOnlyColumn($columns,$filter,$order,$start.','.$limit);
         return $events;

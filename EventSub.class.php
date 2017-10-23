@@ -40,10 +40,6 @@ class EventSub extends MysqlEntity{
         $this->customQuery($query);
     }
 
-    public function setIdFilter($filter, $userId) {
-        return array('IN' => 'SELECT eventid FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` WHERE userid=' . $userId);
-    }
-
     function getUserid(){
         return $this->userid;
     }

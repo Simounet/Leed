@@ -83,7 +83,7 @@ switch($action){
         $page = (isset($_['page'])?$_['page']:1);
         $pages = ceil($numberOfItem/$articlePerPages);
         $startArticle = ($page-1)*$articlePerPages;
-        $events = $currentFeed->getEvents($startArticle,$articlePerPages,$order,$target, false, $myUser->getId());
+        $events = $currentFeed->getEvents($startArticle,$articlePerPages,$order,$target, false, array('userid' => $myUser->getId(), 'feedid' => $_['feed']));
 
         $tpl->assign('order',(isset($_['order'])?$_['order']:''));
 
