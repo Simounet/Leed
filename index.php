@@ -18,7 +18,7 @@ if($isAlwaysDisplayed) {
     //Récuperation des dossiers de flux par ordre de nom
     $tpl->assign('folders',$folderManager->loadAllOnlyColumn('*',array('userid' => $myUser->getId()), 'name'));
     //Recuperation de tous les non Lu
-    $tpl->assign('unread',$feedManager->countUnreadEvents());
+    $tpl->assign('unread',$feedManager->countUnreadEvents($myUser->getId()));
     //recuperation de tous les flux
     $allFeeds = $feedManager->getFeedsPerFolder($myUser->getId());
     $tpl->assign('allFeeds',$allFeeds);

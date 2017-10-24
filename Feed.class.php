@@ -291,9 +291,10 @@ class Feed extends MysqlEntity{
         return $events;
     }
 
-    function countUnreadEvents(){
+    function countUnreadEvents($userId){
         $unreads = array();
-        $results = Feed::customQuery("SELECT COUNT(`".MYSQL_PREFIX."event`.`id`), `".MYSQL_PREFIX."event`.`feedurl` FROM `".MYSQL_PREFIX."event` WHERE `".MYSQL_PREFIX."event`.`unread` = 1 GROUP BY `".MYSQL_PREFIX."event`.`feedurl`") ;
+        $eventSubManager = new EventSub();
+        $results = Feed::customQuery("SELECT COUNT(`".MYSQL_PREFIX."event`.`id`), `".MYSQL_PREFIX."event`.`feedurl` FROM `".MYSQL_PREFIX."event` INNER JOIN " . $eventSubManager->getEventRelationFilter() . "  WHERE `". MYSQL_PREFIX . "event_sub`.`userid`=" . $userId . " AND  `".MYSQL_PREFIX."event`.`unread` = 1 GROUP BY `".MYSQL_PREFIX."event`.`feedurl`") ;
         if($results!=false){
             $total = 0;
             while($item = $results->fetch_array()){
