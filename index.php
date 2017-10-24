@@ -45,9 +45,6 @@ if (!isset($displayOnlyUnreadFeedFolder)) $displayOnlyUnreadFeedFolder=false;
 ($displayOnlyUnreadFeedFolder=='true')?$displayOnlyUnreadFeedFolder_reverse='false':$displayOnlyUnreadFeedFolder_reverse='true';
 $optionFeedIsVerbose = $configurationManager->get('optionFeedIsVerbose');
 
-$page = 0;
-$pages = 0;
-
 $tpl->assign('articleDisplayAuthor',$articleDisplayAuthor);
 $tpl->assign('articleDisplayDate',$articleDisplayDate);
 $tpl->assign('articleDisplayFolderSort',$articleDisplayFolderSort);
@@ -70,7 +67,11 @@ $tpl->assign('target',$target);
 $tpl->assign('feeds','');
 $tpl->assign('order','');
 $tpl->assign('unreadEventsForFolder',0);
+
 $pagesArray = array();
+$page = (isset($_['page'])?$_['page']:1);
+$pages = 0;
+$startArticle = ($page-1)*$articlePerPages;
 
 switch($action){
     /* AFFICHAGE DES EVENEMENTS D'UN FLUX EN PARTICULIER */
@@ -80,9 +81,7 @@ switch($action){
         $numberOfItem = $eventManager->rowCount(array('feedurl'=>$currentFeed->getWebsite()));
         $allowedOrder = array('date'=>'pubdate DESC','older'=>'pubdate','unread'=>'unread DESC,pubdate DESC');
         $order = (isset($_['order'])?$allowedOrder[$_['order']]:$allowedOrder['unread']);
-        $page = (isset($_['page'])?$_['page']:1);
         $pages = ceil($numberOfItem/$articlePerPages);
-        $startArticle = ($page-1)*$articlePerPages;
         $events = $currentFeed->getEvents($startArticle,$articlePerPages,$order,$target, false, array('userid' => $myUser->getId(), 'feedid' => $_['feed']));
 
         $tpl->assign('order',(isset($_['order'])?$_['order']:''));
@@ -93,9 +92,7 @@ switch($action){
         $currentFolder = $folderManager->getById($_['folder']);
         $tpl->assign('currentFolder',$currentFolder);
         $numberOfItem = $currentFolder->unreadCount();
-        $page = (isset($_['page'])?$_['page']:1);
         $pages = ceil($numberOfItem/$articlePerPages);
-        $startArticle = ($page-1)*$articlePerPages;
         if($articleDisplayFolderSort) {$order = '`'.MYSQL_PREFIX.'event`.`pubdate` desc';} else {$order = '`'.MYSQL_PREFIX.'event`.`pubdate` asc';}
         $events = $currentFolder->getEvents($startArticle,$articlePerPages,$order,$target);
 
@@ -104,9 +101,7 @@ switch($action){
     /* AFFICHAGE DES EVENEMENTS FAVORIS */
     case 'favorites':
         $numberOfItem = $eventManager->rowCount(array('favorite'=>1));
-        $page = (isset($_['page'])?$_['page']:1);
         $pages = ceil($numberOfItem/$articlePerPages);
-        $startArticle = ($page-1)*$articlePerPages;
         $events = $eventManager->loadAllOnlyColumn($target,array('favorite'=>1),'pubdate DESC',$startArticle.','.$articlePerPages);
         $tpl->assign('numberOfItem',$numberOfItem);
     break;
@@ -129,9 +124,7 @@ switch($action){
         } else {
             $numberOfItem = $eventManager->getEventCountNotVerboseFeed($myUser->getId());
         }
-        $page = (isset($_['page'])?$_['page']:1);
         $pages = ($articlePerPages>0?ceil($numberOfItem/$articlePerPages):1);
-        $startArticle = ($page-1)*$articlePerPages;
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {
             $events = $eventManager->loadAllOnlyColumn($target,$filter,$order,$startArticle.','.$articlePerPages);
