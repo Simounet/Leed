@@ -337,16 +337,6 @@ class Feed extends MysqlEntity{
         return $feeds;
     }
 
-    public function getUrlsFromFolderMap($folderMap) {
-        $urls = array();
-        foreach($folderMap as $folder) {
-            foreach($folder as $feed) {
-                $urls[] = $feed['url'];
-            }
-        }
-        return array_unique($urls);
-    }
-
     function getFolder(){
         return $this->folder;
     }

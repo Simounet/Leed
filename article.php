@@ -76,8 +76,9 @@ switch($action){
     /* AFFICHAGE DES EVENEMENTS NON LUS (COMPORTEMENT PAR DEFAUT) */
     case 'unreadEvents':
     default:
-        $filter = array('feedurl'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']));
-        $filter['unread'] = 1;
+        $filter = array('unread'=>1, 'userid' => $myUser->getId());
+        $eventSubManager = new EventSub();
+        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {
             $events = $eventManager->loadAllOnlyColumn($target,$filter,$order,$articleConf['startArticle'].','.$articleConf['articlePerPages']);

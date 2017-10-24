@@ -116,7 +116,7 @@ switch($action){
         if(!$isAlwaysDisplayed) {
             break;
         }
-        $filter = array('feedurl'=>$feedManager->getUrlsFromFolderMap($allFeeds['folderMap']), 'unread'=>1, 'userid' => $myUser->getId());
+        $filter = array('unread'=>1, 'userid' => $myUser->getId());
         $eventSubManager = new EventSub();
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         if($optionFeedIsVerbose) {
