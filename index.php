@@ -25,7 +25,7 @@ if($isAlwaysDisplayed) {
     //recuperation de tous les flux par dossier
     $tpl->assign('allFeedsPerFolder',$allFeeds['folderMap']);
     //recuperation de tous les event nons lu par dossiers
-    $tpl->assign('allEvents',$eventManager->getEventCountPerFolder());
+    $tpl->assign('allEvents',$eventSubManager->getEventCountPerFolder());
     //utilisé pour récupérer le statut d'un feed dans le template (en erreur ou ok)
     $feedState = new Feed();
     $tpl->assign('feedState',$feedState);
@@ -55,7 +55,7 @@ $tpl->assign('articlePerPages',$articlePerPages);
 $tpl->assign('displayOnlyUnreadFeedFolder',$displayOnlyUnreadFeedFolder);
 $tpl->assign('displayOnlyUnreadFeedFolder_reverse',$displayOnlyUnreadFeedFolder_reverse);
 
-$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
+$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_sub`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
 if($articleDisplayMode=='summary') $target .= '`'.MYSQL_PREFIX.'event`.`description`,';
 if($articleDisplayMode=='content') $target .= '`'.MYSQL_PREFIX.'event`.`content`,';
 if($articleDisplayLink) $target .= '`'.MYSQL_PREFIX.'event`.`link`,';
@@ -100,9 +100,11 @@ switch($action){
     break;
     /* AFFICHAGE DES EVENEMENTS FAVORIS */
     case 'favorites':
+        $filter = array('favorite'=>1);
+        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         $numberOfItem = $eventManager->rowCount(array('favorite'=>1));
         $pages = ceil($numberOfItem/$articlePerPages);
-        $events = $eventManager->loadAllOnlyColumn($target,array('favorite'=>1),'pubdate DESC',$startArticle.','.$articlePerPages);
+        $events = $eventManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$startArticle.','.$articlePerPages);
         $tpl->assign('numberOfItem',$numberOfItem);
     break;
 
@@ -117,7 +119,6 @@ switch($action){
             break;
         }
         $filter = array('unread'=>1, 'userid' => $myUser->getId());
-        $eventSubManager = new EventSub();
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         if($optionFeedIsVerbose) {
             $numberOfItem = $eventManager->rowCount($filter);

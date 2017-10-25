@@ -78,6 +78,7 @@ if (empty($myUser)) {
 
 $feedManager = new Feed();
 $eventManager = new Event();
+$eventSubManager = new EventSub();
 $folderManager = new Folder();
 
 // Sélection de la langue de l'interface utilisateur

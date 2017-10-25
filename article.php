@@ -39,7 +39,7 @@ if(isset($_['hightlighted'])) {
 
 $tpl->assign('time',$_SERVER['REQUEST_TIME']);
 
-$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
+$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_sub`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
 if($articleDisplayMode=='summary') $target .= '`'.MYSQL_PREFIX.'event`.`description`,';
 if($articleDisplayMode=='content') $target .= '`'.MYSQL_PREFIX.'event`.`content`,';
 if($articleDisplayLink) $target .= '`'.MYSQL_PREFIX.'event`.`link`,';
@@ -70,6 +70,7 @@ switch($action){
     break;
     /* AFFICHAGE DES EVENEMENTS FAVORIS */
     case 'favorites':
+        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         $filter['favorite'] = 1;
         $events = $eventManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$articleConf['startArticle'].','.$articleConf['articlePerPages']);
     break;
@@ -77,7 +78,6 @@ switch($action){
     case 'unreadEvents':
     default:
         $filter = array('unread'=>1, 'userid' => $myUser->getId());
-        $eventSubManager = new EventSub();
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {

@@ -44,6 +44,23 @@ class EventSub extends MysqlEntity{
         return '`' . MYSQL_PREFIX . 'event_sub` ON `' . MYSQL_PREFIX . 'event`.`id` = `' . MYSQL_PREFIX . 'event_sub`.`eventid`';
     }
 
+    public function getEventCountPerFolder(){
+        $events = array();
+        // @TODO must be filtered by user
+        $query = 'SELECT COUNT(`'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`eventid`),`'.MYSQL_PREFIX.'feed`.`folder` ' .
+            'FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` ' .
+            'INNER JOIN `'.MYSQL_PREFIX.'feed` ' .
+            'ON (`'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`feedid` = `'.MYSQL_PREFIX.'feed`.`id`) ' .
+            'WHERE `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 ' .
+            'GROUP BY `'.MYSQL_PREFIX.'feed`.`folder`';
+        $results = $this->customQuery($query);
+        while($item = $results->fetch_array()){
+            $events[$item[1]] = intval($item[0]);
+        }
+
+        return $events;
+    }
+
     function getUserid(){
         return $this->userid;
     }

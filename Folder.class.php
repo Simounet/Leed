@@ -27,7 +27,7 @@ class Folder extends MysqlEntity{
             'ON (`'.MYSQL_PREFIX.'event`.`id` = `'.MYSQL_PREFIX.'event_sub`.`eventid`) '.
             'INNER JOIN `'.MYSQL_PREFIX.'feed` '.
             'ON (`'.MYSQL_PREFIX.'event_sub`.`feedid` = `'.MYSQL_PREFIX.'feed`.`id`) '.
-            'WHERE `'.MYSQL_PREFIX.'event`.`unread`=1 ' .
+            'WHERE `'.MYSQL_PREFIX.'event_sub`.`unread`=1 ' .
             'AND `'.MYSQL_PREFIX.'feed`.`folder` = '.$this->getId());
         $number = $results->fetch_array();
         return $number[0];

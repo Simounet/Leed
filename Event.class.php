@@ -47,16 +47,6 @@ class Event extends MysqlEntity{
     }
 
 
-    function getEventCountPerFolder(){
-        $events = array();
-        $results = $this->customQuery('SELECT COUNT(`'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`id`),`'.MYSQL_PREFIX.'feed`.`folder` FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) WHERE `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 GROUP BY `'.MYSQL_PREFIX.'feed`.`folder`');
-        while($item = $results->fetch_array()){
-            $events[$item[1]] = intval($item[0]);
-        }
-
-        return $events;
-    }
-
     function getEventCountNotVerboseFeed($userId=0){
         $eventSubManager = new EventSub();
         $results = $this->customQuery('SELECT COUNT(1) FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) INNER JOIN ' .$eventSubManager->getEventRelationFilter() . ' WHERE `'. MYSQL_PREFIX . 'event_sub`.`userid`=' . $userId . ' AND `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose`=0');
