@@ -8,7 +8,7 @@
 
 class Event extends MysqlEntity{
 
-    protected $id,$title,$guid,$content,$description,$pudate,$link,$feedurl,$category,$creator,$favorite;
+    protected $id,$title,$guid,$content,$description,$pudate,$link,$feedurl,$category,$creator;
     protected $TABLE_NAME = 'event';
     protected $object_fields =
     array(
@@ -20,15 +20,13 @@ class Event extends MysqlEntity{
         'description'=>'longstring',
         'link'=>'longstring',
         'feedurl'=>'longstring',
-        'favorite'=>'integer',
         'pubdate'=>'integer',
         'syncId'=>'integer',
     );
 
     protected $object_fields_index =
     array(
-        'feedurl'=>'index',
-        'favorite'=>'index'
+        'feedurl'=>'index'
     );
 
     function __construct($guid=null,$title=null,$description=null,$content=null,$pubdate=null,$link=null,$category=null,$creator=null){
@@ -183,13 +181,6 @@ class Event extends MysqlEntity{
     function getFeedUrl(){
         return $this->feedurl;
     }
-    function setFavorite($favorite){
-        $this->favorite = $favorite;
-    }
-    function getFavorite(){
-        return $this->favorite;
-    }
-
 }
 
 ?>

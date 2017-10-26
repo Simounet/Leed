@@ -55,7 +55,7 @@ $tpl->assign('articlePerPages',$articlePerPages);
 $tpl->assign('displayOnlyUnreadFeedFolder',$displayOnlyUnreadFeedFolder);
 $tpl->assign('displayOnlyUnreadFeedFolder_reverse',$displayOnlyUnreadFeedFolder_reverse);
 
-$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_sub`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
+$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_sub`.`unread`,`'.MYSQL_PREFIX.'event_sub`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
 if($articleDisplayMode=='summary') $target .= '`'.MYSQL_PREFIX.'event`.`description`,';
 if($articleDisplayMode=='content') $target .= '`'.MYSQL_PREFIX.'event`.`content`,';
 if($articleDisplayLink) $target .= '`'.MYSQL_PREFIX.'event`.`link`,';
@@ -100,9 +100,9 @@ switch($action){
     break;
     /* AFFICHAGE DES EVENEMENTS FAVORIS */
     case 'favorites':
-        $filter = array('favorite'=>1);
+        $filter = array('favorite'=>1, 'userid' => $myUser->getId());
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
-        $numberOfItem = $eventSubManager->rowCount(array('favorite'=>1));
+        $numberOfItem = $eventSubManager->rowCount($filter);
         $pages = ceil($numberOfItem/$articlePerPages);
         $events = $eventSubManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$startArticle.','.$articlePerPages);
         $tpl->assign('numberOfItem',$numberOfItem);

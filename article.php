@@ -39,7 +39,7 @@ if(isset($_['hightlighted'])) {
 
 $tpl->assign('time',$_SERVER['REQUEST_TIME']);
 
-$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_sub`.`unread`,`'.MYSQL_PREFIX.'event`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
+$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_sub`.`unread`,`'.MYSQL_PREFIX.'event_sub`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
 if($articleDisplayMode=='summary') $target .= '`'.MYSQL_PREFIX.'event`.`description`,';
 if($articleDisplayMode=='content') $target .= '`'.MYSQL_PREFIX.'event`.`content`,';
 if($articleDisplayLink) $target .= '`'.MYSQL_PREFIX.'event`.`link`,';
@@ -72,6 +72,7 @@ switch($action){
     case 'favorites':
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         $filter['favorite'] = 1;
+        $filter['userid'] = $myUser->getId();
         $events = $eventSubManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$articleConf['startArticle'].','.$articleConf['articlePerPages']);
     break;
     /* AFFICHAGE DES EVENEMENTS NON LUS (COMPORTEMENT PAR DEFAUT) */
