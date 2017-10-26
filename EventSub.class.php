@@ -5,7 +5,7 @@
  @description: Classe de gestion des évenements/news liés a chaques flux RSS/ATOM
  */
 
-class EventSub extends MysqlEntity{
+class EventSub extends Event{
 
     protected $userid,$eventid,$unread,$favorite;
     protected $TABLE_NAME = 'event_sub';
@@ -28,6 +28,7 @@ class EventSub extends MysqlEntity{
     function __construct($userid=null,$eventid=null){
         $this->userid = $userid;
         $this->eventid = $eventid;
+        $this->object_fields = array_merge(get_class_vars(get_parent_class($this))['object_fields'], $this->object_fields);
         parent::__construct();
     }
 
@@ -41,7 +42,7 @@ class EventSub extends MysqlEntity{
     }
 
     public function getEventRelationFilter() {
-        return '`' . MYSQL_PREFIX . 'event_sub` ON `' . MYSQL_PREFIX . 'event`.`id` = `' . MYSQL_PREFIX . 'event_sub`.`eventid`';
+        return '`' . MYSQL_PREFIX . 'event` ON `' . MYSQL_PREFIX . 'event`.`id` = `' . MYSQL_PREFIX . 'event_sub`.`eventid`';
     }
 
     public function getEventCountPerFolder(){

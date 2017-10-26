@@ -8,7 +8,7 @@
 
 class Event extends MysqlEntity{
 
-    protected $id,$title,$guid,$content,$description,$pudate,$link,$feedurl,$category,$creator,$unread,$favorite;
+    protected $id,$title,$guid,$content,$description,$pudate,$link,$feedurl,$category,$creator,$favorite;
     protected $TABLE_NAME = 'event';
     protected $object_fields =
     array(
@@ -19,7 +19,6 @@ class Event extends MysqlEntity{
         'content'=>'extralongstring',
         'description'=>'longstring',
         'link'=>'longstring',
-        'unread'=>'integer',
         'feedurl'=>'longstring',
         'favorite'=>'integer',
         'pubdate'=>'integer',
@@ -29,7 +28,6 @@ class Event extends MysqlEntity{
     protected $object_fields_index =
     array(
         'feedurl'=>'index',
-        'unread'=>'index',
         'favorite'=>'index'
     );
 
@@ -179,13 +177,6 @@ class Event extends MysqlEntity{
         $this->syncId = $syncId;
     }
 
-    function getUnread(){
-        return $this->unread;
-    }
-
-    function setUnread($unread){
-        $this->unread = $unread;
-    }
     function setFeedUrl($feedUrl){
         $this->feedurl = $feedUrl;
     }

@@ -78,7 +78,7 @@ switch($action){
     case 'selectedFeed':
         $currentFeed = $feedManager->getById($_['feed']);
         $tpl->assign('currentFeed',$currentFeed);
-        $numberOfItem = $eventManager->rowCount(array('feedurl'=>$currentFeed->getWebsite()));
+        $numberOfItem = $eventSubManager->rowCount(array('feedid'=>$currentFeed->getId()));
         $allowedOrder = array('date'=>'pubdate DESC','older'=>'pubdate','unread'=>'unread DESC,pubdate DESC');
         $order = (isset($_['order'])?$allowedOrder[$_['order']]:$allowedOrder['unread']);
         $pages = ceil($numberOfItem/$articlePerPages);
@@ -102,9 +102,9 @@ switch($action){
     case 'favorites':
         $filter = array('favorite'=>1);
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
-        $numberOfItem = $eventManager->rowCount(array('favorite'=>1));
+        $numberOfItem = $eventSubManager->rowCount(array('favorite'=>1));
         $pages = ceil($numberOfItem/$articlePerPages);
-        $events = $eventManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$startArticle.','.$articlePerPages);
+        $events = $eventSubManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$startArticle.','.$articlePerPages);
         $tpl->assign('numberOfItem',$numberOfItem);
     break;
 
@@ -121,16 +121,16 @@ switch($action){
         $filter = array('unread'=>1, 'userid' => $myUser->getId());
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         if($optionFeedIsVerbose) {
-            $numberOfItem = $eventManager->rowCount($filter);
+            $numberOfItem = $eventSubManager->rowCount($filter);
         } else {
-            $numberOfItem = $eventManager->getEventCountNotVerboseFeed($myUser->getId());
+            $numberOfItem = $eventSubManager->getEventCountNotVerboseFeed($myUser->getId());
         }
         $pages = ($articlePerPages>0?ceil($numberOfItem/$articlePerPages):1);
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {
-            $events = $eventManager->loadAllOnlyColumn($target,$filter,$order,$startArticle.','.$articlePerPages);
+            $events = $eventSubManager->loadAllOnlyColumn($target,$filter,$order,$startArticle.','.$articlePerPages);
         } else {
-            $events = $eventManager->getEventsNotVerboseFeed($startArticle,$articlePerPages,$order,$target,$myUser->getId());
+            $events = $eventSubManager->getEventsNotVerboseFeed($startArticle,$articlePerPages,$order,$target,$myUser->getId());
         }
         $tpl->assign('numberOfItem',$numberOfItem);
 

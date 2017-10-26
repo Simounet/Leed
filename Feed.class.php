@@ -129,7 +129,6 @@ class Feed extends MysqlEntity{
             $event->setLink($item->get_permalink());
 
             $event->setFeedUrl($this->url);
-            $event->setUnread(1); // inexistant, donc non-lu
             $enclosure = $this->getEnclosureHtml($item->get_enclosure());
             $event->setContent($item->get_content().$enclosure);
             $event->setDescription($item->get_description().$enclosure);
@@ -286,8 +285,7 @@ class Feed extends MysqlEntity{
         if(isset($eventSubFilters['feedid'])) {
             $filter[MYSQL_PREFIX.'event_sub.feedid'] = $eventSubFilters['feedid'];
         }
-        $eventManager = new Event();
-        $events = $eventManager->loadAllOnlyColumn($columns,$filter,$order,$start.','.$limit);
+        $events = $eventSubManager->loadAllOnlyColumn($columns,$filter,$order,$start.','.$limit);
         return $events;
     }
 

@@ -55,7 +55,7 @@ class Folder extends MysqlEntity{
         $results = $this->customQuery($query);
         if($results!=false){
             while($item = $results->fetch_array()){
-                $object = new Event();
+                $object = new EventSub();
                     foreach($object->getObject_fields() as $field=>$type){
                         $setter = 'set'.ucFirst($field);
                         if(isset($item[$field])) $object->$setter($item[$field]);
