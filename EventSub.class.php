@@ -62,6 +62,19 @@ class EventSub extends Event{
         return $events;
     }
 
+    public function populateOnKnownFeed($url, $newFeedId, $userId) {
+        $event = new Event();
+        $knownFeedEvents = $event->loadAllOnlyColumn('id',array('feedurl' => $url));
+        $insertValues = array();
+        foreach($knownFeedEvents as $knownFeedEvent) {
+            $insertValues[] = '(' . $userId . ', ' . $newFeedId . ', ' . $knownFeedEvent->getId() . ')';
+        }
+        $insertValuesStr = implode(',', $insertValues);
+        $query = "INSERT INTO " . MYSQL_PREFIX . $this->TABLE_NAME . " (userid, feedid, eventid) " .
+            "VALUES " . $insertValuesStr;
+        return $this->customQuery($query);
+    }
+
     function getUserid(){
         return $this->userid;
     }

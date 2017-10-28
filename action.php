@@ -307,8 +307,9 @@ switch ($action){
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         require_once("SimplePie.class.php");
         if(!isset($_['newUrl'])) break;
+        $feedUrl = Functions::clean_url($_['newUrl']);
         $newFeed = new Feed();
-        $newFeed->setUrl(Functions::clean_url($_['newUrl']));
+        $newFeed->setUrl($feedUrl);
         if ($newFeed->notRegistered($myUser->getId())) {
             $newFeed->getInfos();
             $newFeed->setFolder(
@@ -316,6 +317,8 @@ switch ($action){
             );
             $newFeed->setUserid($myUser->getId());
             $newFeed->save();
+            $eventSub = new EventSub();
+            $eventSub->populateOnKnownFeed($feedUrl, $newFeed->getId(), $myUser->getId());
             $enableCache = ($configurationManager->get('synchronisationEnableCache')=='')?0:$configurationManager->get('synchronisationEnableCache');
             $forceFeed = ($configurationManager->get('synchronisationForceFeed')=='')?0:$configurationManager->get('synchronisationForceFeed');
             $newFeed->parse(time(), $_, $enableCache, $forceFeed);
