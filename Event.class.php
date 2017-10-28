@@ -126,6 +126,17 @@ class Event extends MysqlEntity{
         }
     }
 
+    public function clean($feedUrl = "") {
+        $feed = new Feed();
+        if(!empty($feedUrl)) {
+            $remainingFeeds = $feed->loadAllOnlyColumn('id', array('url' => $feedUrl));
+            if(count($remainingFeeds) === 0) {
+                return $this->delete(array('feedurl' => $feedUrl));
+            }
+        }
+        return false;
+    }
+
     function setPubdate($pubdate){
         $this->pubdate = (is_numeric($pubdate)?$pubdate:strtotime($pubdate));
     }

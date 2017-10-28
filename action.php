@@ -342,9 +342,10 @@ switch ($action){
     case 'removeFeed':
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         if(isset($_GET['id'])){
+            $currentFeed = $feedManager->load(array('id'=>$_['id'], 'userid' => $myUser->getId()));
             $feedManager->delete(array('id'=>$_['id'], 'userid' => $myUser->getId()));
-            //@TODO Multiuser
-            //$eventManager->delete(array('feed'=>$_['id']));
+            $eventManager->clean($currentFeed->getUrl());
+            $eventSubManager->delete(array('userid' => $myUser->getId(), 'feedid' => $_['id']));
             Plugin::callHook("action_after_removeFeed", array($_['id']));
         }
         header('location: ./settings.php');
