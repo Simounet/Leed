@@ -72,28 +72,29 @@ switch ($action){
 
 
     case 'readAll':
-        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         $whereClause = array();
         $whereClause['unread'] = '1';
-        if(isset($_['feed']))$whereClause['feed'] = $_['feed'];
-        if(isset($_['last-event-id']))$whereClause['id'] = '<= ' . $_['last-event-id'];
-        $eventManager->change(array('unread'=>'0'),$whereClause);
+        $whereClause['userid'] = $myUser->getId();
+        if(isset($_['feed']))$whereClause['feedid'] = $_['feed'];
+        if(isset($_['last-event-id']))$whereClause['eventid'] = '<= ' . $_['last-event-id'];
+        $eventSubManager->change(array('unread'=>'0'),$whereClause);
         if(!Functions::isAjaxCall()){
             header('location: ./index.php');
         }
     break;
 
     case 'readFolder':
-        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
 
         $feeds = $feedManager->loadAllOnlyColumn('id',array('folder'=>$_['folder']));
 
         foreach($feeds as $feed){
-            $whereClause['feed'] = $feed->getId();
-            if(isset($_['last-event-id']))$whereClause['id'] = '<= ' . $_['last-event-id'];
-            $eventManager->change(array('unread'=>'0'),$whereClause);
+            $whereClause = array();
+            $whereClause['unread'] = '1';
+            $whereClause['feedid'] = $feed->getId();
+            if(isset($_['last-event-id']))$whereClause['eventid'] = '<= ' . $_['last-event-id'];
+            $eventSubManager->change(array('unread'=>'0'),$whereClause);
         }
 
         if (!Functions::isAjaxCall()){
@@ -388,7 +389,6 @@ switch ($action){
     break;
 
     case 'readContent':
-        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -397,13 +397,12 @@ switch ($action){
             exit();
         }
         if(isset($_['id'])){
-            $event = $eventManager->load(array('id'=>$_['id']));
-            $eventManager->change(array('unread'=>'0'),array('id'=>$_['id']));
+            $event = $eventSubManager->load(array('eventid'=>$_['id']));
+            $eventSubManager->change(array('userid'=>$myUser->getId(),'unread'=>'0'),array('eventid'=>$_['id']));
         }
     break;
 
     case 'unreadContent':
-        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -412,13 +411,12 @@ switch ($action){
             exit();
         }
         if(isset($_['id'])){
-            $event = $eventManager->load(array('id'=>$_['id']));
-            $eventManager->change(array('unread'=>'1'),array('id'=>$_['id']));
+            $event = $eventSubManager->load(array('eventid'=>$_['id']));
+            $eventSubManager->change(array('userid'=>$myUser->getId(),'unread'=>'1'),array('eventid'=>$_['id']));
         }
     break;
 
     case 'addFavorite':
-        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -426,11 +424,10 @@ switch ($action){
             echo json_encode($response_array);
             exit();
         }
-        $eventManager->change(array('favorite'=>'1'),array('id'=>$_['id']));
+        $eventSubManager->change(array('userid'=>$myUser->getId(),'favorite'=>'1'),array('eventid'=>$_['id']));
     break;
 
     case 'removeFavorite':
-        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -438,7 +435,7 @@ switch ($action){
             echo json_encode($response_array);
             exit();
         }
-        $eventManager->change(array('favorite'=>'0'),array('id'=>$_['id']));
+        $eventSubManager->change(array('userid'=>$myUser->getId(),'favorite'=>'0'),array('eventid'=>$_['id']));
     break;
 
     case 'login':
