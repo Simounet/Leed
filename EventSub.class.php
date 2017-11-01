@@ -75,6 +75,34 @@ class EventSub extends Event{
         return $this->customQuery($query);
     }
 
+    public function removeOlds($feedId, $maxEvents, $currentSyncId){
+        if ($maxEvents<=0) return;
+        $nbLines = $this->rowCount(array(
+            'feedid'=>$feedId,
+            'unread'=>0,
+            'favorite'=>0
+        ));
+        $limit = $nbLines - $maxEvents;
+        if ($limit<=0) return;
+        $tableEventSub = '`'.MYSQL_PREFIX.$this->TABLE_NAME."`";
+        $query = "DELETE sub1 FROM " . $tableEventSub . " sub1 ".
+        "INNER JOIN " .
+            "( SELECT * " .
+            "FROM " . $tableEventSub . " sub " .
+            "INNER JOIN " . MYSQL_PREFIX . "event ev " .
+            "ON sub.eventid = ev.id " .
+            "WHERE feedid={$feedId} " .
+            "AND favorite=0 " .
+            "AND unread=0 " .
+            "AND syncId!={$currentSyncId} " .
+            "ORDER BY pubdate ASC " .
+            "LIMIT {$limit} ) " .
+        "AS sub2 " .
+        "ON sub1.eventid = sub2.eventid";
+        ///@TODO: escape the variables inside mysql
+         $this->customQuery($query);
+    }
+
     function getUserid(){
         return $this->userid;
     }

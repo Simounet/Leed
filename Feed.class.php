@@ -204,25 +204,6 @@ class Feed extends MysqlEntity{
         return $html;
     }
 
-
-    function removeOldEvents($maxEvent, $currentSyncId){
-        if ($maxEvent<=0) return;
-        $eventManager = new Event();
-        $nbLines = $eventManager->rowCount(array(
-            'feed'=>$this->id,
-             'unread'=>0,
-            'favorite'=>0,
-        ));
-        $limit = $nbLines - $maxEvent;
-        if ($limit<=0) return;
-        $tableEvent = '`'.MYSQL_PREFIX."event`";
-        $query = "
-            DELETE FROM {$tableEvent} WHERE feed={$this->id} AND favorite!=1 AND unread!=1 AND syncId!={$currentSyncId} ORDER BY pubdate ASC LIMIT {$limit}
-        ";
-        ///@TODO: escape the variables inside mysql
-         $this->customQuery($query);
-    }
-
     function setId($id){
         $this->id = $id;
     }
@@ -342,8 +323,12 @@ class Feed extends MysqlEntity{
         return $feeds;
     }
 
-    public function getFeedsToSynchronize() {
-        $result = $this->customQuery("SELECT * FROM " . MYSQL_PREFIX . $this->TABLE_NAME . " GROUP BY url");
+    public function getFeedsToSynchronize($limit = false) {
+        $query = "SELECT * FROM " . MYSQL_PREFIX . $this->TABLE_NAME . " GROUP BY url";
+        if($limit) {
+            $query .= " ORDER BY lastupdate LIMIT " . $limit;
+        }
+        $result = $this->customQuery($query);
         return $this->getObjectsFromQuery($result);
     }
 
@@ -434,9 +419,11 @@ class Feed extends MysqlEntity{
             }
             if (!$parseOk && !$commandLine) echo '</div>';
 //             if ($commandLine) echo "\n";
-            // @TODO Multiuser
-            // $feed->removeOldEvents($maxEvents, $syncId);
+            $eventSub = new EventSub();
+            $eventSub->removeOlds($feed->id, $maxEvents, $syncId);
         }
+        // @TODO Multiuser
+        // cleanup event's orphans
         assert('$nbTotal==$nbOk+$nbErrors');
         $totalTime = microtime(true)-$start;
         assert('$totalTime>=$localTotal');

@@ -24,10 +24,8 @@ Plugin::callHook("action_pre_case", array(&$_,$myUser));
 switch ($action){
     case 'commandLine':
     case 'synchronize':
-        //@TODO Multiuser
         require_once("SimplePie.class.php");
         $syncCode = $configurationManager->get('synchronisationCode');
-        $syncGradCount = $configurationManager->get('syncGradCount');
         if (   false==$myUser
             && !$commandLine
             && !(isset($_['code'])
@@ -57,7 +55,8 @@ switch ($action){
             $syncTypeStr = _t('SYNCHRONISATION_TYPE').' : '._t($synchronisationCustom['type']);
         }elseif('graduate'==$synchronisationType){
             // sélectionne les 10 plus vieux flux
-            $feeds = $feedManager->loadAll(null,'lastupdate', $syncGradCount);
+            $syncGradCount = $configurationManager->get('syncGradCount');
+            $feeds = $feedManager->getFeedsToSynchronize($syncGradCount);
             $syncTypeStr = _t('SYNCHRONISATION_TYPE').' : '._t('GRADUATE_SYNCHRONISATION');
         }else{
             $feeds = $feedManager->getFeedsToSynchronize();
