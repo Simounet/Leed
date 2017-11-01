@@ -60,8 +60,7 @@ switch ($action){
             $feeds = $feedManager->loadAll(null,'lastupdate', $syncGradCount);
             $syncTypeStr = _t('SYNCHRONISATION_TYPE').' : '._t('GRADUATE_SYNCHRONISATION');
         }else{
-            // sélectionne tous les flux, triés par le nom
-            $feeds = $feedManager->loadAllOnlyColumn('*',array('userid' => $myUser->getId()), 'name');
+            $feeds = $feedManager->getFeedsToSynchronize();
             $syncTypeStr = _t('SYNCHRONISATION_TYPE').' : '._t('FULL_SYNCHRONISATION');
         }
 

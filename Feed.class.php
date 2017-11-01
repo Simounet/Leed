@@ -342,6 +342,11 @@ class Feed extends MysqlEntity{
         return $feeds;
     }
 
+    public function getFeedsToSynchronize() {
+        $result = $this->customQuery("SELECT * FROM " . MYSQL_PREFIX . $this->TABLE_NAME . " GROUP BY url");
+        return $this->getObjectsFromQuery($result);
+    }
+
     function getFolder(){
         return $this->folder;
     }
@@ -429,7 +434,8 @@ class Feed extends MysqlEntity{
             }
             if (!$parseOk && !$commandLine) echo '</div>';
 //             if ($commandLine) echo "\n";
-            $feed->removeOldEvents($maxEvents, $syncId);
+            // @TODO Multiuser
+            // $feed->removeOldEvents($maxEvents, $syncId);
         }
         assert('$nbTotal==$nbOk+$nbErrors');
         $totalTime = microtime(true)-$start;
