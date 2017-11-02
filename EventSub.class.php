@@ -25,6 +25,11 @@ class EventSub extends Event{
         'eventid'=>'index'
     );
 
+    protected $default_values = array(
+        'unread' => 1,
+        'favorite' => 0
+    );
+
     function __construct($userid=null,$eventid=null,$mergeFields=true){
         $this->userid = $userid;
         $this->eventid = $eventid;
