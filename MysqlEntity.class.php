@@ -125,7 +125,8 @@ class MysqlEntity
         $i=false;
         foreach($this->object_fields as $field=>$type){
             if($i){$query .=',';}else{$i=true;}
-            $query .='`'.$field.'`  '. $this->sgbdType($type).'  NOT NULL';
+            $default = isset($this->default_values[$field]) ? 'DEFAULT ' . $this->default_values[$field] : '';
+            $query .='`'.$field.'`  '. $this->sgbdType($type).' ' . $default . '  NOT NULL';
         }
         if (isset($this->object_fields_index)){
             foreach($this->object_fields_index as $field=>$type){
