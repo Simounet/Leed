@@ -124,7 +124,7 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
         $feedManager->create();
         $eventManager = new Event();
         $eventManager->create();
-        $eventSubManager = new EventSub();
+        $eventSubManager = new EventSub(null, null, false);
         $eventSubManager->create();
         $folderManager = new Folder();
         $folderManager->create();

@@ -25,10 +25,12 @@ class EventSub extends Event{
         'eventid'=>'index'
     );
 
-    function __construct($userid=null,$eventid=null){
+    function __construct($userid=null,$eventid=null,$mergeFields=true){
         $this->userid = $userid;
         $this->eventid = $eventid;
-        $this->object_fields = array_merge(get_class_vars(get_parent_class($this))['object_fields'], $this->object_fields);
+        if($mergeFields === true) {
+            $this->object_fields = array_merge(get_class_vars(get_parent_class($this))['object_fields'], $this->object_fields);
+        }
         parent::__construct();
     }
 
