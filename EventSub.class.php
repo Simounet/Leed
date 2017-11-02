@@ -40,12 +40,11 @@ class EventSub extends Event{
     }
 
     public function saveEventsSub($feedId, $eventId, $userIds) {
-        $queryValues = array();
+        $insertValues = array();
         foreach($userIds as $userId) {
-            $queryValues[] = '(' . $userId . ', ' . $feedId . ', ' . $eventId . ')';
+            $insertValues[] = '(' . $userId . ', ' . $feedId . ', ' . $eventId . ' )';
         }
-        $query = 'INSERT INTO `' . MYSQL_PREFIX . $this->TABLE_NAME . '` (userid, feedid, eventid) VALUES ' . implode( ',', $queryValues ) . ';';
-        $this->customQuery($query);
+        return $this->insertValues($insertValues);
     }
 
     public function getEventRelationFilter() {
@@ -72,11 +71,18 @@ class EventSub extends Event{
     public function populateOnKnownFeed($url, $newFeedId, $userId) {
         $event = new Event();
         $knownFeedEvents = $event->loadAllOnlyColumn('id',array('feedurl' => $url));
+        if(empty($knownFeedEvents)) {
+            return false;
+        }
         $insertValues = array();
         foreach($knownFeedEvents as $knownFeedEvent) {
             $insertValues[] = '(' . $userId . ', ' . $newFeedId . ', ' . $knownFeedEvent->getId() . ')';
         }
-        $insertValuesStr = implode(',', $insertValues);
+        return $this->insertValues($insertValues);
+    }
+
+    protected function insertValues($values) {
+        $insertValuesStr = implode(',', $values);
         $query = "INSERT INTO " . MYSQL_PREFIX . $this->TABLE_NAME . " (userid, feedid, eventid) " .
             "VALUES " . $insertValuesStr;
         return $this->customQuery($query);
