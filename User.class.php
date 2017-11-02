@@ -164,8 +164,11 @@ class User extends MysqlEntity{
         $feedManager->delete(array('userid' => $userId));
     }
 
-    protected function createDefaultFolder() {
+    public function createDefaultFolder() {
         $folderManager = new Folder();
+        if(!$folderManager->tableExists()) {
+            return false;
+        }
         $folderManager->setName(_t('GENERAL_FOLDER'));
         $folderManager->setUserid($this->getId());
         $folderManager->setParent(-1);

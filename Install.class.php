@@ -60,6 +60,7 @@ class Install {
             Update::ExecutePatch(true);
             require_once('Feed.class.php');
             require_once('Event.class.php');
+            require_once('EventSub.class.php');
             require_once('User.class.php');
             require_once('Folder.class.php');
             require_once('Configuration.class.php');
@@ -114,6 +115,7 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
         $userManager->create();
         $userManager->add($this->options['user']['login'], $this->options['user']['password'], $this->salt, $this->logger);
         $this->createSideTables();
+        $userManager->createDefaultFolder();
         $_SESSION['currentUser'] = serialize($userManager->get($this->options['user']['login']));
     }
 
@@ -122,6 +124,8 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
         $feedManager->create();
         $eventManager = new Event();
         $eventManager->create();
+        $eventSubManager = new EventSub();
+        $eventSubManager->create();
         $folderManager = new Folder();
         $folderManager->create();
     }

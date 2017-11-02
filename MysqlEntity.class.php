@@ -129,7 +129,8 @@ class MysqlEntity
         }
         if (isset($this->object_fields_index)){
             foreach($this->object_fields_index as $field=>$type){
-                $query .= ',KEY `index'.$field.'` (`'.$field.'`)';
+                $size = $this->object_fields[$field] === 'longstring' ? '(255)' : '';
+                $query .= ',KEY `index'.$field.'` (`'.$field.'`'.$size.')';
             }
         }
         if (isset($this->object_fields_uniques)){
@@ -137,10 +138,9 @@ class MysqlEntity
                 $query .= ',UNIQUE `unique'.$field.'` (`'.$field.'`)';
             }
         }
-        $query .= ')
-        ENGINE InnoDB,
-        DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-        ;';
+        $query .= ')' .
+        'ENGINE InnoDB,' .
+        'DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;';
         if($this->debug)echo '<hr>'.get_class($this).' ('.__METHOD__ .') : Requete --> '.$query.'<br>'.$this->dbconnector->connection->error;
         $myQuery = $this->customQuery($query);
     }
