@@ -100,6 +100,7 @@ class Feed extends MysqlEntity{
 
         $events = array();
         $iEvents = 0;
+        $newEventsIds = array();
         foreach($items as $item){
             // Ne retient que les 100 premiers éléments de flux.
             if ($iEvents++>=100) break;
@@ -144,9 +145,10 @@ class Feed extends MysqlEntity{
 
             $event->setCategory($item->get_category());
             $event->save();
-            $this->eventSubSave($event->getId());
+            $newEventsIds[] = $event->getId();
             $nbEvents++;
         }
+        $this->eventsSubSave($this->url, $newEventsIds);
 
         $listid = "";
         foreach($events as $item){
@@ -159,17 +161,20 @@ class Feed extends MysqlEntity{
         return true;
     }
 
-    protected function eventSubSave($eventId) {
-        if($eventId == 0) {
+    protected function eventsSubSave($url, $eventsIds) {
+        if(empty($eventsIds)) {
             return false;
         }
-        $feedSubscribed = $this->loadAllOnlyColumn('userid, id', array('url' => $this->url));
-        $userIds = array();
+        $feedSubscribed = $this->loadAllOnlyColumn('userid, id', array('url' => $url));
+        $users = array();
         foreach($feedSubscribed as $feed) {
-            $userIds[] = $feed->getUserid();
+            $users[] = array(
+                'userid' => $feed->getUserid(),
+                'feedid' => $feed->getId()
+            );
         }
         $eventSub = new EventSub();
-        $eventSub->saveEventsSub($feed->getId(), $eventId, $userIds);
+        $eventSub->saveEventsSub($eventsIds, $users);
     }
 
     protected function getEnclosureHtml($enclosure) {

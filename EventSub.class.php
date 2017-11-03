@@ -39,10 +39,12 @@ class EventSub extends Event{
         parent::__construct();
     }
 
-    public function saveEventsSub($feedId, $eventId, $userIds) {
+    public function saveEventsSub($eventsIds, $users) {
         $insertValues = array();
-        foreach($userIds as $userId) {
-            $insertValues[] = '(' . $userId . ', ' . $feedId . ', ' . $eventId . ' )';
+        foreach($users as $user) {
+            foreach($eventsIds as $eventId) {
+                $insertValues[] = '(' . $user['userid'] . ', ' . $user['feedid'] . ', ' . $eventId . ' )';
+            }
         }
         return $this->insertValues($insertValues);
     }
