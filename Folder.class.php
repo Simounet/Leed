@@ -72,13 +72,22 @@ class Folder extends MysqlEntity{
         parent::__construct();
     }
 
+    public function remove($userId) {
+        $feedManager = new Feed();
+        $feeds = $feedManager->loadFromFolderId($this->getId());
+        foreach($feeds as $feed) {
+            $feed->remove($userId);
+        }
+        parent::delete(array('id'=>$this->getId(), 'userid'=>$userId));
+    }
+
     function setId($id){
         $this->id = $id;
     }
 
-    function getFeeds(){
+    public function getFeeds(){
         $feedManager = new Feed();
-        return $feedManager->loadAll(array('folder'=>$this->getId()),'name');
+        return $feedManager->loadFromFolderId($this->getId());
     }
 
     function getFolders(){

@@ -280,6 +280,10 @@ class Feed extends MysqlEntity{
         parent::rowCount($filter);
     }
 
+    public function loadFromFolderId($folderId) {
+        return $this->loadAll(array('folder' => $folderId), 'name');
+    }
+
     function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false, $eventSubFilters=array()){
         $eventSubManager = new EventSub();
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
