@@ -37,6 +37,24 @@ class Feed extends MysqlEntity{
         parent::__construct();
     }
 
+    public function remove($userId) {
+        parent::delete(
+            array(
+                'id'=>$this->getId(),
+                'userid' => $userId
+            )
+        );
+        $event = new Event();
+        $event->clean($this->getUrl());
+        $eventSub = new EventSub();
+        $eventSub->delete(
+            array(
+                'userid' => $userId,
+                'feedid' => $this->getId()
+            )
+        );
+    }
+
     /** @TODO: ne faire qu'un seul chargement avec SimplePie et récupérer les
     même informations. Mettre le chargement en cache au moins d'une méthode
     loadLeed() qui ne chargera qu'une seule fois. Voire même en déclenchement
