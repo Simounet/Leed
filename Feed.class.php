@@ -427,8 +427,6 @@ class Feed extends MysqlEntity{
             $eventSub = new EventSub();
             $eventSub->removeOlds($feed->id, $maxEvents, $syncId);
         }
-        // @TODO Multiuser
-        // cleanup event's orphans
         assert('$nbTotal==$nbOk+$nbErrors');
         $totalTime = microtime(true)-$start;
         assert('$totalTime>=$localTotal');

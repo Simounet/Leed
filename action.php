@@ -204,7 +204,6 @@ switch ($action){
 
 
     case 'importForm':
-        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
         echo '<html style="height:auto;"><link rel="stylesheet" href="templates/'.$theme.'/css/style.css">
                 <body style="height:auto;">
@@ -219,7 +218,6 @@ switch ($action){
     break;
 
     case 'synchronizeForm':
-        //@TODO Multiuser
      if(isset($myUser) && $myUser!=false){
         echo '<link rel="stylesheet" href="templates/'.$theme.'/css/style.css">
                 <a class="button" href="action.php?action=synchronize">'._t('SYNCHRONIZE_NOW').'</a>
@@ -238,8 +236,7 @@ switch ($action){
     break;
 
     case 'importFeed':
-        //@TODO Multiuser
-        // On ne devrait pas mettre de style ici.
+        // @TODO On ne devrait pas mettre de style ici.
         echo "<html>
             <style>
                 a {
