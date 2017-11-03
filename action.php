@@ -400,7 +400,7 @@ switch ($action){
         }
         if(isset($_['id'])){
             $event = $eventSubManager->load(array('eventid'=>$_['id']));
-            $eventSubManager->change(array('userid'=>$myUser->getId(),'unread'=>'0'),array('eventid'=>$_['id']));
+            $eventSubManager->change(array('unread'=>'0'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
         }
     break;
 
@@ -414,7 +414,7 @@ switch ($action){
         }
         if(isset($_['id'])){
             $event = $eventSubManager->load(array('eventid'=>$_['id']));
-            $eventSubManager->change(array('userid'=>$myUser->getId(),'unread'=>'1'),array('eventid'=>$_['id']));
+            $eventSubManager->change(array('unread'=>'1'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
         }
     break;
 
@@ -426,7 +426,7 @@ switch ($action){
             echo json_encode($response_array);
             exit();
         }
-        $eventSubManager->change(array('userid'=>$myUser->getId(),'favorite'=>'1'),array('eventid'=>$_['id']));
+        $eventSubManager->change(array('favorite'=>'1'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
     break;
 
     case 'removeFavorite':
@@ -437,7 +437,7 @@ switch ($action){
             echo json_encode($response_array);
             exit();
         }
-        $eventSubManager->change(array('userid'=>$myUser->getId(),'favorite'=>'0'),array('eventid'=>$_['id']));
+        $eventSubManager->change(array('favorite'=>'0'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
     break;
 
     case 'login':
