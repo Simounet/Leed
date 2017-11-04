@@ -146,7 +146,7 @@
                     <form method="POST" action="action.php?action=updateConfiguration">
                     <section>
                         <h3>{function="_t('GENERALITY')"}</h3>
-                        <p><label for="root">{function="_t('PROJECT_ROOT')"} :</label> <input type="text" id="root" name="root" value="{$configurationManager->get('root')}"></p>
+                        <p><label for="root">{function="_t('PROJECT_ROOT')"} :</label> <input type="text" id="root" name="root" value="{$root}"></p>
                         <h4>{function="_t('LET_SLASH_AT_END')"}</h4>
                         <p>{function="_t('INSTALL_LANGUAGE')"} :
                         <select name="ChgLanguage">
@@ -230,7 +230,7 @@
                         </fieldset>
                         <fieldset>
                             <legend><label for="articlePerPages">{function="_t('EVENT_NUMBER_PER_PAGES')"}</label></legend>
-                            <input type="text" value="{$configurationManager->get('articlePerPages')}" id="articlePerPages" name="articlePerPages" size="4" />
+                            <input type="text" value="{$articlePerPages}" id="articlePerPages" name="articlePerPages" size="4" />
                         </fieldset>
                         <fieldset>
                             <legend>{function="_t('SORT_BY_RECENT_EVENT_HOME')"}</legend>
@@ -264,7 +264,7 @@
                             <input type="radio" {if="$articleDisplayMode=='content'"} checked="checked" {/if} value="content" id="articleDisplayModeContent" name="articleDisplayMode" /><label for="articleDisplayModeContent">{function="_t('CONTENT')"}</label>
                         </fieldset>
                         <fieldset>
-                            <legend>{function="_t('KEEP_LAST_X_EVENTS_FEED',array('<input type="text" value="'.$configurationManager->get('feedMaxEvents').'" name="feedMaxEvents" size="4" />'))"}</legend>
+                            <legend>{function="_t('KEEP_LAST_X_EVENTS_FEED',array('<input type="text" value="'.$feedMaxEvents.'" name="feedMaxEvents" size="4" />'))"}</legend>
                             <h4>{function="_t('KEEP_LAST_X_EVENTS_FEED_DESC')"}</h4>
                         </fieldset>
 
@@ -315,7 +315,7 @@
                 <section class="bookBloc">
                     <h2>{function="_t('USE_BOOKMARK')"} :</h2>
                     {if="$myUser!=false"}
-                    <a class="button" href="javascript:document.location='{$configurationManager->get('root')}action.php?action=login&newUrl='+escape(document.location)+'&usr={function="$myUser->getToken()"}'">+ {function="_t('ADD_TO_LEED')"}</a>
+                    <a class="button" href="javascript:document.location='{$root}action.php?action=login&newUrl='+escape(document.location)+'&usr={function="$myUser->getToken()"}'">+ {function="_t('ADD_TO_LEED')"}</a>
                     <p>{function="_t('USE_BOOKMARK_DESC')"}</p>
                     {else}
                     <p>{function="_t('YOU_MUST_BE_CONNECTED_BOOKMARK')"}</p>
