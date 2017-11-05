@@ -33,17 +33,17 @@ if($isAlwaysDisplayed) {
 //afficher ou non le champ OTP
 $tpl->assign('otpEnabled', $configurationManager->get('otpEnabled'));
 
-$articleDisplayAuthor = $configurationManager->get('articleDisplayAuthor');
-$articleDisplayDate = $configurationManager->get('articleDisplayDate');
-$articleDisplayFolderSort = $configurationManager->get('articleDisplayFolderSort');
-$articleDisplayHomeSort = $configurationManager->get('articleDisplayHomeSort');
-$articleDisplayLink = $configurationManager->get('articleDisplayLink');
-$articleDisplayMode = $configurationManager->get('articleDisplayMode');
-$articlePerPages = $configurationManager->get('articlePerPages');
-$displayOnlyUnreadFeedFolder = $configurationManager->get('displayOnlyUnreadFeedFolder');
+$articleDisplayAuthor = $userConfigurationManager->get('articleDisplayAuthor');
+$articleDisplayDate = $userConfigurationManager->get('articleDisplayDate');
+$articleDisplayFolderSort = $userConfigurationManager->get('articleDisplayFolderSort');
+$articleDisplayHomeSort = $userConfigurationManager->get('articleDisplayHomeSort');
+$articleDisplayLink = $userConfigurationManager->get('articleDisplayLink');
+$articleDisplayMode = $userConfigurationManager->get('articleDisplayMode');
+$articlePerPages = $userConfigurationManager->get('articlePerPages');
+$displayOnlyUnreadFeedFolder = $userConfigurationManager->get('displayOnlyUnreadFeedFolder');
 if (!isset($displayOnlyUnreadFeedFolder)) $displayOnlyUnreadFeedFolder=false;
 ($displayOnlyUnreadFeedFolder=='true')?$displayOnlyUnreadFeedFolder_reverse='false':$displayOnlyUnreadFeedFolder_reverse='true';
-$optionFeedIsVerbose = $configurationManager->get('optionFeedIsVerbose');
+$optionFeedIsVerbose = $userConfigurationManager->get('optionFeedIsVerbose');
 
 $tpl->assign('articleDisplayAuthor',$articleDisplayAuthor);
 $tpl->assign('articleDisplayDate',$articleDisplayDate);
@@ -139,11 +139,7 @@ switch($action){
 $tpl->assign('pages',$pages);
 $tpl->assign('page',$page);
 
-$paginationScale = $configurationManager->get('paginationScale');
-if (empty($paginationScale)) {
-    $configurationManager->put('paginationScale', 5);
-    $paginationScale = $configurationManager->get('paginationScale');
-}
+$paginationScale = $userConfigurationManager->get('paginationScale');
 
 for($i=($page-$paginationScale<=0?1:$page-$paginationScale);$i<($page+$paginationScale>$pages+1?$pages+1:$page+$paginationScale);$i++){
     $pagesArray[]=$i;

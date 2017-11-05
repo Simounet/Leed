@@ -488,7 +488,7 @@ class MysqlEntity
                     if($i){$whereClause .=' ' . $condition . ' ';}else{$i=true;}
                     $whereColumn = $this->getColumn($filter);
                     $whereClause .= $whereColumn;
-                    $whereClause .= $customQueryOperator[0] . '"'.$this->secure($customQueryOperator[1], $whereColumn).'"';
+                    $whereClause .= $customQueryOperator[0] . '"'.$this->secure($customQueryOperator[1], $filter).'"';
                 }
             }
         }

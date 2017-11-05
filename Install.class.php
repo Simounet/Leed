@@ -64,6 +64,7 @@ class Install {
             require_once('User.class.php');
             require_once('Folder.class.php');
             require_once('Configuration.class.php');
+            require_once('UserConfiguration.class.php');
 
             $this->createConfig();
             $this->createUser();

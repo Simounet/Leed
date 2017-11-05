@@ -26,3 +26,16 @@ UPDATE `##MYSQL_PREFIX##event_sub` sub LEFT JOIN `##MYSQL_PREFIX##event` ev ON e
 ALTER  TABLE `##MYSQL_PREFIX##event` DROP unread;
 UPDATE `##MYSQL_PREFIX##event_sub` sub LEFT JOIN `##MYSQL_PREFIX##event` ev ON ev.id = sub.eventid SET sub.favorite = ev.favorite;
 ALTER  TABLE `##MYSQL_PREFIX##event` DROP favorite;
+CREATE TABLE `##MYSQL_PREFIX##user_configuration` (
+  `userid` int(11) NOT NULL,
+  `key` varchar(225) NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`userid`, `key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `##MYSQL_PREFIX##user_configuration` (`userid`, `key`, `value`)
+    SELECT 1, `key`, `value`
+    FROM `##MYSQL_PREFIX##configuration`
+    WHERE `key`
+    IN( "articleDisplayAnonymous", "articleDisplayAuthor", "articleDisplayDate", "articleDisplayFolderSort", "articleDisplayHomeSort", "articleDisplayLink", "articleDisplayMode", "articlePerPages", "displayOnlyUnreadFeedFolder", "language", "theme", "cryptographicSalt", "optionFeedIsVerbose");
+DELETE FROM `##MYSQL_PREFIX##configuration` WHERE `key` IN("articleDisplayAnonymous", "articleDisplayAuthor", "articleDisplayDate", "articleDisplayFolderSort", "articleDisplayHomeSort", "articleDisplayLink", "articleDisplayMode", "articlePerPages", "displayOnlyUnreadFeedFolder", "language", "theme", "cryptographicSalt", "optionFeedIsVerbose");

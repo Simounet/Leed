@@ -102,25 +102,24 @@ switch ($action){
     break;
 
     case 'updateConfiguration':
-        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
 
             //Ajout des préférences et réglages
             $configurationManager->put('root',(substr($_['root'], strlen($_['root'])-1)=='/'?$_['root']:$_['root'].'/'));
-            $configurationManager->put('articleDisplayAnonymous',$_['articleDisplayAnonymous']);
-            $configurationManager->put('articlePerPages',$_['articlePerPages']);
-            $configurationManager->put('articleDisplayLink',$_['articleDisplayLink']);
-            $configurationManager->put('articleDisplayDate',$_['articleDisplayDate']);
-            $configurationManager->put('articleDisplayAuthor',$_['articleDisplayAuthor']);
-            $configurationManager->put('articleDisplayHomeSort',$_['articleDisplayHomeSort']);
-            $configurationManager->put('articleDisplayFolderSort',$_['articleDisplayFolderSort']);
-            $configurationManager->put('articleDisplayMode',$_['articleDisplayMode']);
+            $userConfigurationManager->put('articleDisplayAnonymous',$_['articleDisplayAnonymous']);
+            $userConfigurationManager->put('articlePerPages',$_['articlePerPages']);
+            $userConfigurationManager->put('articleDisplayLink',$_['articleDisplayLink']);
+            $userConfigurationManager->put('articleDisplayDate',$_['articleDisplayDate']);
+            $userConfigurationManager->put('articleDisplayAuthor',$_['articleDisplayAuthor']);
+            $userConfigurationManager->put('articleDisplayHomeSort',$_['articleDisplayHomeSort']);
+            $userConfigurationManager->put('articleDisplayFolderSort',$_['articleDisplayFolderSort']);
+            $userConfigurationManager->put('articleDisplayMode',$_['articleDisplayMode']);
             $configurationManager->put('synchronisationType',$_['synchronisationType']);
             $configurationManager->put('synchronisationEnableCache',$_['synchronisationEnableCache']);
             $configurationManager->put('synchronisationForceFeed',$_['synchronisationForceFeed']);
             $configurationManager->put('feedMaxEvents',$_['feedMaxEvents']);
-            $configurationManager->put('language',$_['ChgLanguage']);
-            $configurationManager->put('theme',$_['ChgTheme']);
+            $userConfigurationManager->put('language',$_['ChgLanguage']);
+            $userConfigurationManager->put('theme',$_['ChgTheme']);
             $configurationManager->put('otpEnabled',$_['otpEnabled']);
 
             if(trim($_['password'])!='') {
@@ -131,13 +130,13 @@ switch ($action){
                 ici. C'est ainsi parce que c'est plus efficace de stocker le sel
                 dans la config que dans le fichier de constantes, difficile à
                 modifier. */
-                $oldSalt = $configurationManager->get('cryptographicSalt');
+                $oldSalt = $userConfigurationManager->get('cryptographicSalt');
                 if (empty($oldSalt))
                     /* Pendant la migration à ce système, les déploiements
                     ne posséderont pas cette donnée. */
-                    $configurationManager->add('cryptographicSalt', $salt);
+                    $userConfigurationManager->add('cryptographicSalt', $salt);
                 else
-                    $configurationManager->change(array('value'=>$salt), array('key'=>'cryptographicSalt'));
+                    $userConfigurationManager->change(array('value'=>$salt), array('key'=>'cryptographicSalt'));
 
             }
 
@@ -452,7 +451,7 @@ switch ($action){
                 if (false===$tmpUser) {
                     $message = "Unknown user '{$_['login']}'! No password reset.";
                 } else {
-                    $tmpUser->resetPassword($resetPassword, $configurationManager->get('cryptographicSalt'));
+                    $tmpUser->resetPassword($resetPassword, $userConfigurationManager->get('cryptographicSalt'));
                     $message = "User '{$_['login']}' (id={$tmpUser->getId()}) Password reset to '$resetPassword'.";
                 }
             }
@@ -469,7 +468,7 @@ switch ($action){
                 exit();
             }
         }else{
-            $salt = $configurationManager->get('cryptographicSalt');
+            $salt = $userConfigurationManager->get('cryptographicSalt');
             if (empty($salt)) $salt = '';
             $user = $userManager->exist($_['login'],$_['password'],$salt,@$_['otp']);
             if($user==false){
@@ -477,6 +476,7 @@ switch ($action){
                 header('location: ./index.php?action=wrongLogin');
             }else{
                 $_SESSION['currentUser'] = serialize($user);
+                unset($_SESSION[UserConfiguration::SESSION]);
                 if (isset($_['rememberMe'])) $user->setStayConnected();
                 header('location: ./index.php');
             }
@@ -511,7 +511,6 @@ switch ($action){
     break;
 
     case 'displayOnlyUnreadFeedFolder':
-        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -519,11 +518,10 @@ switch ($action){
             echo json_encode($response_array);
             exit();
         }
-        $configurationManager->put('displayOnlyUnreadFeedFolder',$_['displayOnlyUnreadFeedFolder']);
+        $userConfigurationManager->put('displayOnlyUnreadFeedFolder',$_['displayOnlyUnreadFeedFolder']);
     break;
 
     case 'displayFeedIsVerbose':
-        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -539,7 +537,6 @@ switch ($action){
         break;
 
     case 'optionFeedIsVerbose':
-        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -548,14 +545,11 @@ switch ($action){
             exit();
         }
         // changement du statut de l'option
-        $configurationManager = new Configuration();
-        $conf = $configurationManager->getAll();
-        $configurationManager->put('optionFeedIsVerbose',($_['optionFeedIsVerbose']=="0"?0:1));
+        $userConfigurationManager->put('optionFeedIsVerbose',($_['optionFeedIsVerbose']=="0"?0:1));
 
         break;
 
     case 'articleDisplayMode':
-        //@TODO Multiuser
         if($myUser==false) {
             $response_array['status'] = 'noconnect';
             $response_array['texte'] = _t('YOU_MUST_BE_CONNECTED_ACTION');
@@ -582,7 +576,7 @@ switch ($action){
         $login = isset($_['login']) ? $_['login'] : false;
         $password = isset($_['password']) ? $_['password'] : false;
         $admin = new User();
-        $admin->add($login, $password, $configurationManager->get('cryptographicSalt'));
+        $admin->add($login, $password, $userConfigurationManager->get('cryptographicSalt'));
         header('location: ./settings.php#usersBloc');
         break;
 

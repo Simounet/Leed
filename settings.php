@@ -30,7 +30,7 @@ foreach($dirs as $dir){
 }
 sort($themeList);
 $tpl->assign('themeList',$themeList);
-$tpl->assign('currentTheme',$configurationManager->get('theme'));
+$tpl->assign('currentTheme',$userConfigurationManager->get('theme'));
 
 //autres variables de configuration
 if($myUser){
@@ -40,13 +40,14 @@ if($myUser){
 $tpl->assign('synchronisationType',$configurationManager->get('synchronisationType'));
 $tpl->assign('synchronisationEnableCache',$configurationManager->get('synchronisationEnableCache'));
 $tpl->assign('synchronisationForceFeed',$configurationManager->get('synchronisationForceFeed'));
-$tpl->assign('articleDisplayLink', $configurationManager->get('articleDisplayLink'));
-$tpl->assign('articleDisplayDate', $configurationManager->get('articleDisplayDate'));
-$tpl->assign('articleDisplayAuthor', $configurationManager->get('articleDisplayAuthor'));
-$tpl->assign('articleDisplayHomeSort', $configurationManager->get('articleDisplayHomeSort'));
-$tpl->assign('articleDisplayFolderSort', $configurationManager->get('articleDisplayFolderSort'));
-$tpl->assign('articleDisplayMode', $configurationManager->get('articleDisplayMode'));
-$tpl->assign('optionFeedIsVerbose', $configurationManager->get('optionFeedIsVerbose'));
+$tpl->assign('articleDisplayLink', $userConfigurationManager->get('articleDisplayLink'));
+$tpl->assign('articleDisplayDate', $userConfigurationManager->get('articleDisplayDate'));
+$tpl->assign('articleDisplayAuthor', $userConfigurationManager->get('articleDisplayAuthor'));
+$tpl->assign('articleDisplayHomeSort', $userConfigurationManager->get('articleDisplayHomeSort'));
+$tpl->assign('articleDisplayFolderSort', $userConfigurationManager->get('articleDisplayFolderSort'));
+$tpl->assign('articleDisplayMode', $userConfigurationManager->get('articleDisplayMode'));
+$tpl->assign('articlePerPages', $userConfigurationManager->get('articlePerPages'));
+$tpl->assign('optionFeedIsVerbose', $userConfigurationManager->get('optionFeedIsVerbose'));
 $tpl->assign('feedMaxEvents', $configurationManager->get('feedMaxEvents'));
 $tpl->assign('root', $configurationManager->get('root'));
 $tpl->assign('userList', $userManager->getUserList());

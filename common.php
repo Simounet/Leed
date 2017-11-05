@@ -44,6 +44,7 @@ class_exists('EventSub') or require_once('EventSub.class.php');
 class_exists('User') or require_once('User.class.php');
 class_exists('Folder') or require_once('Folder.class.php');
 class_exists('Configuration') or require_once('Configuration.class.php');
+class_exists('UserConfiguration') or require_once('UserConfiguration.class.php');
 class_exists('Opml') or require_once('Opml.class.php');
 class_exists('Logger') or require_once('Logger.class.php');
 
@@ -55,15 +56,6 @@ date_default_timezone_set('Europe/Paris');
 
 $configurationManager = new Configuration();
 $conf = $configurationManager->getAll();
-
-$theme = $configurationManager->get('theme');
-
-//Instanciation du template
-$tpl = new RainTPL();
-//Definition des dossiers de template
-raintpl::configure("base_url", null );
-raintpl::configure("tpl_dir", './templates/'.$theme.'/' );
-raintpl::configure("cache_dir", "./cache/tmp/" );
 
 $resultUpdate = Update::ExecutePatch();
 
@@ -81,12 +73,20 @@ $eventManager = new Event();
 $eventSubManager = new EventSub();
 $folderManager = new Folder();
 
-// Sélection de la langue de l'interface utilisateur
-if (!$myUser) {
-    $languages = Translation::getHttpAcceptLanguages();
-} else {
-    $languages = array($configurationManager->get('language'));
-}
+$userId = $myUser ? $myUser->getId() : 1;
+
+$userConfigurationManager = new UserConfiguration($userId);
+$userConfigurationManager->getAll();
+$languages = $myUser ? array($userConfigurationManager->get('language')) : Translation::getHttpAcceptLanguages();
+
+$theme = $userConfigurationManager->get('theme');
+
+//Instanciation du template
+$tpl = new RainTPL();
+//Definition des dossiers de template
+raintpl::configure("base_url", null );
+raintpl::configure("tpl_dir", './templates/'.$theme.'/' );
+raintpl::configure("cache_dir", "./cache/tmp/" );
 
 i18n_init($languages, dirname(__FILE__).'/templates/'.$theme.'/');
 if ($resultUpdate) die (_t('LEED_UPDATE_MESSAGE'));
@@ -100,7 +100,7 @@ $tpl->assign('folderManager',$folderManager);
 $tpl->assign('configurationManager',$configurationManager);
 $tpl->assign('synchronisationCode',$configurationManager->get('synchronisationCode'));
 
-$articleDisplayAnonymous = $configurationManager->get('articleDisplayAnonymous');
+$articleDisplayAnonymous = $userConfigurationManager->get('articleDisplayAnonymous');
 $tpl->assign('articleDisplayAnonymous',$articleDisplayAnonymous);
 
 $isAlwaysDisplayed = ($articleDisplayAnonymous=='1') || ($myUser!=false);

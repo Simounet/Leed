@@ -18,14 +18,14 @@ $tpl->assign('allFeeds',$allFeeds);
 $scroll = isset($_['scroll']) ? $_['scroll'] : 0;
 $tpl->assign('scrollpage',$scroll);
 // récupération des variables pour l'affichage
-$articleConf['articlePerPages'] = $configurationManager->get('articlePerPages');
-$articleDisplayLink = $configurationManager->get('articleDisplayLink');
-$articleDisplayDate = $configurationManager->get('articleDisplayDate');
-$articleDisplayAuthor = $configurationManager->get('articleDisplayAuthor');
-$articleDisplayHomeSort = $configurationManager->get('articleDisplayHomeSort');
-$articleDisplayFolderSort = $configurationManager->get('articleDisplayFolderSort');
-$articleDisplayMode = $configurationManager->get('articleDisplayMode');
-$optionFeedIsVerbose = $configurationManager->get('optionFeedIsVerbose');
+$articleConf['articlePerPages'] = $userConfigurationManager->get('articlePerPages');
+$articleDisplayLink = $userConfigurationManager->get('articleDisplayLink');
+$articleDisplayDate = $userConfigurationManager->get('articleDisplayDate');
+$articleDisplayAuthor = $userConfigurationManager->get('articleDisplayAuthor');
+$articleDisplayHomeSort = $userConfigurationManager->get('articleDisplayHomeSort');
+$articleDisplayFolderSort = $userConfigurationManager->get('articleDisplayFolderSort');
+$articleDisplayMode = $userConfigurationManager->get('articleDisplayMode');
+$optionFeedIsVerbose = $userConfigurationManager->get('optionFeedIsVerbose');
 
 $tpl->assign('articleDisplayAuthor',$articleDisplayAuthor);
 $tpl->assign('articleDisplayDate',$articleDisplayDate);
