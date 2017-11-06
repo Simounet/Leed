@@ -106,39 +106,12 @@ switch ($action){
 
             //Ajout des préférences et réglages
             $configurationManager->put('root',(substr($_['root'], strlen($_['root'])-1)=='/'?$_['root']:$_['root'].'/'));
-            $userConfigurationManager->put('articleDisplayAnonymous',$_['articleDisplayAnonymous']);
-            $userConfigurationManager->put('articlePerPages',$_['articlePerPages']);
-            $userConfigurationManager->put('articleDisplayLink',$_['articleDisplayLink']);
-            $userConfigurationManager->put('articleDisplayDate',$_['articleDisplayDate']);
-            $userConfigurationManager->put('articleDisplayAuthor',$_['articleDisplayAuthor']);
-            $userConfigurationManager->put('articleDisplayHomeSort',$_['articleDisplayHomeSort']);
-            $userConfigurationManager->put('articleDisplayFolderSort',$_['articleDisplayFolderSort']);
-            $userConfigurationManager->put('articleDisplayMode',$_['articleDisplayMode']);
+            $configurationManager->put('articleDisplayAnonymous',$_['articleDisplayAnonymous']);
             $configurationManager->put('synchronisationType',$_['synchronisationType']);
             $configurationManager->put('synchronisationEnableCache',$_['synchronisationEnableCache']);
             $configurationManager->put('synchronisationForceFeed',$_['synchronisationForceFeed']);
             $configurationManager->put('feedMaxEvents',$_['feedMaxEvents']);
-            $userConfigurationManager->put('language',$_['ChgLanguage']);
-            $userConfigurationManager->put('theme',$_['ChgTheme']);
             $configurationManager->put('otpEnabled',$_['otpEnabled']);
-
-            if(trim($_['password'])!='') {
-                $salt = User::generateSalt();
-                $userManager->change(array('password'=>User::encrypt($_['password'], $salt)),array('id'=>$myUser->getId()));
-                /* /!\ En multi-utilisateur, il faudra changer l'information au
-                niveau du compte lui-même et non au niveau du déploiement comme
-                ici. C'est ainsi parce que c'est plus efficace de stocker le sel
-                dans la config que dans le fichier de constantes, difficile à
-                modifier. */
-                $oldSalt = $userConfigurationManager->get('cryptographicSalt');
-                if (empty($oldSalt))
-                    /* Pendant la migration à ce système, les déploiements
-                    ne posséderont pas cette donnée. */
-                    $userConfigurationManager->add('cryptographicSalt', $salt);
-                else
-                    $userConfigurationManager->change(array('value'=>$salt), array('key'=>'cryptographicSalt'));
-
-            }
 
             # Modifications dans la base de données, la portée courante et la sesssion
             # @TODO: gérer cela de façon centralisée
@@ -150,9 +123,39 @@ switch ($action){
                 $_SESSION['currentUser'] = serialize($myUser);
             }
 
-    header('location: ./settings.php#preferenceBloc');
+    header('location: ./settings.php#adminBloc');
     break;
 
+    case 'updateUserConfiguration':
+        if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
+        $userConfigurationManager->put('articlePerPages',$_['articlePerPages']);
+        $userConfigurationManager->put('articleDisplayLink',$_['articleDisplayLink']);
+        $userConfigurationManager->put('articleDisplayDate',$_['articleDisplayDate']);
+        $userConfigurationManager->put('articleDisplayAuthor',$_['articleDisplayAuthor']);
+        $userConfigurationManager->put('articleDisplayHomeSort',$_['articleDisplayHomeSort']);
+        $userConfigurationManager->put('articleDisplayFolderSort',$_['articleDisplayFolderSort']);
+        $userConfigurationManager->put('articleDisplayMode',$_['articleDisplayMode']);
+        $userConfigurationManager->put('language',$_['ChgLanguage']);
+        $userConfigurationManager->put('theme',$_['ChgTheme']);
+        if(trim($_['password'])!='') {
+            $salt = User::generateSalt();
+            $userManager->change(array('password'=>User::encrypt($_['password'], $salt)),array('id'=>$myUser->getId()));
+            /* /!\ En multi-utilisateur, il faudra changer l'information au
+            niveau du compte lui-même et non au niveau du déploiement comme
+            ici. C'est ainsi parce que c'est plus efficace de stocker le sel
+            dans la config que dans le fichier de constantes, difficile à
+            modifier. */
+            $oldSalt = $userConfigurationManager->get('cryptographicSalt');
+            if (empty($oldSalt)) {
+                /* Pendant la migration à ce système, les déploiements
+                ne posséderont pas cette donnée. */
+                $userConfigurationManager->add('cryptographicSalt', $salt);
+            } else {
+                $userConfigurationManager->change(array('value'=>$salt), array('key'=>'cryptographicSalt'));
+            }
+        }
+        header('location: ./settings.php#preferenceBloc');
+    break;
 
     case 'purgeEvents':
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));

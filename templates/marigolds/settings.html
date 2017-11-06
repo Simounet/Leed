@@ -17,6 +17,7 @@
                         <li><a class="toggle" href="#manageBloc">{function="_t('FEED_MANAGING')"}</a></li>
                         <li><a class="toggle" href="#synchronizeBloc">{function="_t('MANUAL_FEED_UPDATE')"}</a></li>
                         <li><a class="toggle" href="#preferenceBloc">{function="_t('PREFERENCES')"}</a></li>
+                        <li><a class="toggle" href="#adminBloc">{function="_t('ADMINISTRATION')"}</a></li>
                         <li><a class="toggle" href="#usersBloc">{function="_t('USERS')"}</a></li>
                         <li><a class="toggle" href="#importBloc">{function="_t('IMPORT')"}</a></li>
                         <li><a class="toggle" href="#exportBloc">{function="_t('EXPORT')"}</a></li>
@@ -143,11 +144,9 @@
                 {if="(isset($myUser)) && ($myUser!=false)"}
                 <section class="preferenceBloc">
                     <h2>{function="_t('PREFERENCES')"} :</h2>
-                    <form method="POST" action="action.php?action=updateConfiguration">
+                    <form method="POST" action="action.php?action=updateUserConfiguration">
                     <section>
                         <h3>{function="_t('GENERALITY')"}</h3>
-                        <p><label for="root">{function="_t('PROJECT_ROOT')"} :</label> <input type="text" id="root" name="root" value="{$root}"></p>
-                        <h4>{function="_t('LET_SLASH_AT_END')"}</h4>
                         <p>{function="_t('INSTALL_LANGUAGE')"} :
                         <select name="ChgLanguage">
                             {loop="$languageList"}
@@ -176,6 +175,66 @@
                         <p><label for="password">{function="_t('PASSWORD')"} :</label> <input type="text" id="password" name="password" autocomplete="off" value="" placeholder="{function="_t('INSTALL_DISPLAY_CLEAR')"}"></p>
                         <p>{function="_t('LET_EMPTY_IF_NO_PASS_CHANGE')"}<br/>
                         {function="_t('HOWTO_RESET_PASSWORD')"}</p>
+                    </section>
+
+                    <section>
+                        {if="$myUser!=false"}
+                        <h3 class="">{function="_t('PREFERENCES')"}</h3>
+                        <fieldset>
+                            <legend><label for="articlePerPages">{function="_t('EVENT_NUMBER_PER_PAGES')"}</label></legend>
+                            <input type="text" value="{$articlePerPages}" id="articlePerPages" name="articlePerPages" size="4" />
+                        </fieldset>
+                        <fieldset>
+                            <legend>{function="_t('SORT_BY_RECENT_EVENT_HOME')"}</legend>
+                            <input type="radio" {if="$articleDisplayHomeSort"} checked="checked" {/if} value="1" id="articleDisplayHomeSortYes" name="articleDisplayHomeSort" /><label for="articleDisplayHomeSortYes">{function="_t('YES')"}</label>
+                            <input type="radio" {if="!$articleDisplayHomeSort"} checked="checked" {/if} value="0" id="articleDisplayHomeSortNo" name="articleDisplayHomeSort" /><label for="articleDisplayHomeSortNo">{function="_t('NO')"}</label>
+                        </fieldset>
+                        <fieldset>
+                            <legend>{function="_t('SORT_BY_RECENT_EVENT_FOLDER')"}</legend>
+                            <input type="radio" {if="$articleDisplayFolderSort"} checked="checked" {/if} value="1" id="articleDisplayFolderSortYes" name="articleDisplayFolderSort" /><label for="articleDisplayFolderSortYes">{function="_t('YES')"}</label>
+                            <input type="radio" {if="!$articleDisplayFolderSort"} checked="checked" {/if} value="0" id="articleDisplayFolderSortNo" name="articleDisplayFolderSort" /><label for="articleDisplayFolderSortNo">{function="_t('NO')"}</label>
+                        </fieldset>
+                        <fieldset>
+                            <legend>{function="_t('SHOW_EVENT_LINK')"}</legend>
+                            <input type="radio"  {if="$articleDisplayLink=='1'"} checked="checked" {/if}value="1" id="articleDisplayLinkYes" name="articleDisplayLink" /><label for="articleDisplayLinkYes">{function="_t('YES')"}</label>
+                            <input type="radio" {if="$articleDisplayLink=='0'"} checked="checked" {/if} value="0" id="articleDisplayLinkNo" name="articleDisplayLink" /><label for="articleDisplayLinkNo">{function="_t('NO')"}</label>
+                        </fieldset>
+                        <fieldset>
+                            <legend>{function="_t('SHOW_EVENT_DATE')"}</legend>
+                            <input type="radio" {if="$articleDisplayDate=='1'"} checked="checked" {/if} value="1" id="articleDisplayDateYes" name="articleDisplayDate" /><label for="articleDisplayDateYes">{function="_t('YES')"}</label>
+                            <input type="radio" {if="$articleDisplayDate=='0'"} checked="checked" {/if} value="0" id="articleDisplayDateNo" name="articleDisplayDate" /><label for="articleDisplayDateNo">{function="_t('NO')"}</label>
+                        </fieldset>
+                        <fieldset>
+                            <legend>{function="_t('SHOW_EVENT_AUTHOR')"}</legend>
+                            <input type="radio" {if="$articleDisplayAuthor=='1'"} checked="checked" {/if} value="1" id="articleDisplayAuthorYes" name="articleDisplayAuthor" /><label for="articleDisplayAuthorYes">{function="_t('YES')"}</label>
+                            <input type="radio" {if="$articleDisplayAuthor=='0'"} checked="checked" {/if} value="0" id="articleDisplayAuthorNo" name="articleDisplayAuthor" /><label for="articleDisplayAuthorNo">{function="_t('NO')"}</label>
+                        </fieldset>
+                        <fieldset>
+                            <legend>{function="_t('SHOW_EVENT_CONTENT')"}</legend>
+                            <input type="radio" {if="$articleDisplayMode=='title'"} checked="checked" {/if} value="title" id="articleDisplayModeTitle" name="articleDisplayMode" /><label for="articleDisplayModeTitle">{function="_t('TITLE')"}</label>
+                            <input type="radio" {if="$articleDisplayMode=='summary'"} checked="checked" {/if} value="summary" id="articleDisplayModeSummary" name="articleDisplayMode" /><label for="articleDisplayModeSummary">{function="_t('SUMMARY')"}</label>
+                            <input type="radio" {if="$articleDisplayMode=='content'"} checked="checked" {/if} value="content" id="articleDisplayModeContent" name="articleDisplayMode" /><label for="articleDisplayModeContent">{function="_t('CONTENT')"}</label>
+                        </fieldset>
+                    </section>
+
+
+
+
+                    <button name="installButton">{function="_t('SAVE')"}</button>
+                    </form>
+                    {else}
+                    <p>{function="_t('YOU_MUST_BE_CONNECTED_BOOKMARK')"}</p>
+                    {/if}
+                </section>
+            {/if}
+
+            <section class="adminBloc">
+                <form method="POST" action="action.php?action=updateConfiguration">
+                    <h2>{function="_t('ADMINISTRATION')"} :</h2>
+                    <section>
+                        <h3>{function="_t('GENERALITY')"}</h3>
+                        <p><label for="root">{function="_t('PROJECT_ROOT')"} :</label> <input type="text" id="root" name="root" value="{$root}"></p>
+                        <h4 class="settings-comment">{function="_t('LET_SLASH_AT_END')"}</h4>
                         <fieldset>
                             <!-- DEBUG <img id="qrCodeOtp" class="qrcodeOtp" src="../../qrcode.php?qr&label={$myUser->getOtpSecret()}&user=DEBUG%20{$myUser->getLogin()}&key={$myUser->getOtpSecret()}&issuer={$serviceUrl}&algorithm=sha1&digits=8&period=30&_qrSize=4&_qrMargin=1"/> -->
                             {if="extension_loaded('gd')"}
@@ -192,7 +251,6 @@
                         </p>
                         </fieldset>
                     </section>
-
                     <section>
                         <h3>{function="_t('SYNCHRONISATION')"}</h3>
                         <p><input type="radio"  {if="$synchronisationType=='auto'"} checked="checked" {/if} value="auto" id="synchronisationTypeComplete" name="synchronisationType"> <label for="synchronisationTypeComplete"><strong>
@@ -217,69 +275,20 @@
                             <p>{function="_t('FORCE_INTEGRATION_DESC')"}</p>
                         </fieldset>
                         </p>
-                    </section>
-
-                    <section>
-                        {if="$myUser!=false"}
-                        <h3>{function="_t('PREFERENCES')"}</h3>
                         <fieldset>
                             <legend>{function="_t('ALLOW_ANONYMOUS_READ')"}</legend>
                             <input type="radio" {if="$articleDisplayAnonymous=='1'"} checked="checked" {/if} value="1" id="articleDisplayAnonymousYes" name="articleDisplayAnonymous" /><label for="articleDisplayAnonymousYes">{function="_t('YES')"}</label>
                             <input type="radio" {if="$articleDisplayAnonymous=='0'"} checked="checked" {/if} value="0" id="articleDisplayAnonymousNo" name="articleDisplayAnonymous" /><label for="articleDisplayAnonymousNo">{function="_t('NO')"}</label>
-                            <h4>{function="_t('ALLOW_ANONYMOUS_READ_DESC')"}</h4>
-                        </fieldset>
-                        <fieldset>
-                            <legend><label for="articlePerPages">{function="_t('EVENT_NUMBER_PER_PAGES')"}</label></legend>
-                            <input type="text" value="{$articlePerPages}" id="articlePerPages" name="articlePerPages" size="4" />
-                        </fieldset>
-                        <fieldset>
-                            <legend>{function="_t('SORT_BY_RECENT_EVENT_HOME')"}</legend>
-                            <input type="radio" {if="$articleDisplayHomeSort"} checked="checked" {/if} value="1" id="articleDisplayHomeSortYes" name="articleDisplayHomeSort" /><label for="articleDisplayHomeSortYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="!$articleDisplayHomeSort"} checked="checked" {/if} value="0" id="articleDisplayHomeSortNo" name="articleDisplayHomeSort" /><label for="articleDisplayHomeSortNo">{function="_t('NO')"}</label>
-                        </fieldset>
-                        <fieldset>
-                            <legend>{function="_t('SORT_BY_RECENT_EVENT_FOLDER')"}</legend>
-                            <input type="radio" {if="$articleDisplayFolderSort"} checked="checked" {/if} value="1" id="articleDisplayFolderSortYes" name="articleDisplayFolderSort" /><label for="articleDisplayFolderSortYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="!$articleDisplayFolderSort"} checked="checked" {/if} value="0" id="articleDisplayFolderSorttNo" name="articleDisplayFolderSort" /><label for="articleDisplayFolderSortNo">{function="_t('NO')"}</label>
-                        </fieldset>
-                        <fieldset>
-                            <legend>{function="_t('SHOW_EVENT_LINK')"}</legend>
-                            <input type="radio"  {if="$articleDisplayLink=='1'"} checked="checked" {/if}value="1" id="articleDisplayLinkYes" name="articleDisplayLink" /><label for="articleDisplayLinkYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="$articleDisplayLink=='0'"} checked="checked" {/if} value="0" id="articleDisplayLinkNo" name="articleDisplayLink" /><label for="articleDisplayLinkNo">{function="_t('NO')"}</label>
-                        </fieldset>
-                        <fieldset>
-                            <legend>{function="_t('SHOW_EVENT_DATE')"}</legend>
-                            <input type="radio" {if="$articleDisplayDate=='1'"} checked="checked" {/if} value="1" id="articleDisplayDateYes" name="articleDisplayDate" /><label for="articleDisplayDateYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="$articleDisplayDate=='0'"} checked="checked" {/if} value="0" id="articleDisplayDateNo" name="articleDisplayDate" /><label for="articleDisplayDateNo">{function="_t('NO')"}</label>
-                        </fieldset>
-                        <fieldset>
-                            <legend>{function="_t('SHOW_EVENT_AUTHOR')"}</legend>
-                            <input type="radio" {if="$articleDisplayAuthor=='1'"} checked="checked" {/if} value="1" id="articleDisplayAuthorYes" name="articleDisplayAuthor" /><label for="articleDisplayAuthorYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="$articleDisplayAuthor=='0'"} checked="checked" {/if} value="0" id="articleDisplayAuthorNo" name="articleDisplayAuthor" /><label for="articleDisplayAuthorNo">{function="_t('NO')"}</label>
-                        </fieldset>
-                        <fieldset>
-                            <legend>{function="_t('SHOW_EVENT_CONTENT')"}</legend>
-                            <input type="radio" {if="$articleDisplayMode=='title'"} checked="checked" {/if} value="title" id="articleDisplayModeTitle" name="articleDisplayMode" /><label for="articleDisplayModeTitle">{function="_t('TITLE')"}</label>
-                            <input type="radio" {if="$articleDisplayMode=='summary'"} checked="checked" {/if} value="summary" id="articleDisplayModeSummary" name="articleDisplayMode" /><label for="articleDisplayModeSummary">{function="_t('SUMMARY')"}</label>
-                            <input type="radio" {if="$articleDisplayMode=='content'"} checked="checked" {/if} value="content" id="articleDisplayModeContent" name="articleDisplayMode" /><label for="articleDisplayModeContent">{function="_t('CONTENT')"}</label>
+                            <h4 class="settings-comment">{function="_t('ALLOW_ANONYMOUS_READ_DESC')"}</h4>
                         </fieldset>
                         <fieldset>
                             <legend>{function="_t('KEEP_LAST_X_EVENTS_FEED',array('<input type="text" value="'.$feedMaxEvents.'" name="feedMaxEvents" size="4" />'))"}</legend>
-                            <h4>{function="_t('KEEP_LAST_X_EVENTS_FEED_DESC')"}</h4>
+                            <h4 class="settings-comment">{function="_t('KEEP_LAST_X_EVENTS_FEED_DESC')"}</h4>
                         </fieldset>
-
                     </section>
-
-
-
-
                     <button name="installButton">{function="_t('SAVE')"}</button>
-                    </form>
-                    {else}
-                    <p>{function="_t('YOU_MUST_BE_CONNECTED_BOOKMARK')"}</p>
-                    {/if}
-                </section>
-            {/if}
+                </form>
+            </section>
 
                 <section class="usersBloc">
                     <h2>{function="_t('USERS')"}</h2>

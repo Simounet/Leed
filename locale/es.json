@@ -1,4 +1,5 @@
 {
+ "ADMINISTRATION": "Administración",
  "ALREADY_INSTALLED":"Leed ya está configurado. Suprimir o renombrar el archivo de configuración.",
  "AT_TOTAL":"en total",
  "BROWSER_AUDIO_ELEMENT_NOT_SUPPORTED": "Tu navegador no implementa el elemento audio",

@@ -431,11 +431,11 @@ header a,header a:hover,header a:visited{
     color: #ffffff;
     cursor: pointer;
 }
-#main article section h2.articleTitle, .preferenceBloc h3{
+#main article section h2.articleTitle{
     margin-bottom:5px;
     font-size:1.1em;
 }
-#main article section h3.articleDetails, .preferenceBloc h4{
+#main article section h3.articleDetails, .settings-comment {
     font-size:10px;
     font-weight:normal;
     color:#939393;
