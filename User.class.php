@@ -109,6 +109,7 @@ class User extends MysqlEntity{
         $this->setPassword($password, $salt);
         $this->save();
         $this->createDefaultFolder();
+        $this->createDefaultUserConfiguration();
         $logger->appendLogs(_t("USER_ADD_OK"). ' '.$login);
         $logger->save();
         return true;
@@ -152,6 +153,8 @@ class User extends MysqlEntity{
     protected function cleanSideTables($userId) {
         $this->cleanFolder($userId);
         $this->cleanFeed($userId);
+        // @TODO Multiuser
+        // $this->cleanUserConfig($userId);
     }
 
     protected function cleanFolder($userId) {
@@ -174,6 +177,11 @@ class User extends MysqlEntity{
         $folderManager->setParent(-1);
         $folderManager->setIsopen(1);
         $folderManager->save();
+    }
+
+    protected function createDefaultUserConfiguration() {
+        $userConfiguration = new UserConfiguration($this->getId());
+        $userConfiguration->setDefaults();
     }
 
     static function existAuthToken($auth=null){

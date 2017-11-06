@@ -68,6 +68,7 @@ class Install {
 
             $this->createConfig();
             $this->createUser();
+            $this->createUserConfig();
             $this->setFinished(true);
             $this->logger->destroy();
         }
@@ -105,7 +106,16 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
         }
         $configurationManager->create();
         $configurationManager->setDefaults();
-        $this->salt = $configurationManager->get('cryptographicSalt');
+    }
+
+    protected function createUserConfig() {
+        $userConfigurationManager = new UserConfiguration();
+        if ($userConfigurationManager->tableExists()) {
+            $userConfigurationManager->truncate();
+        }
+        $userConfigurationManager->create();
+        $userConfigurationManager->setDefaults();
+        $this->salt = $userConfigurationManager->get('cryptographicSalt');
     }
 
     protected function createUser() {
