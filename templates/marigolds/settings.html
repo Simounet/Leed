@@ -17,7 +17,9 @@
                         <li><a class="toggle" href="#manageBloc">{function="_t('FEED_MANAGING')"}</a></li>
                         <li><a class="toggle" href="#synchronizeBloc">{function="_t('MANUAL_FEED_UPDATE')"}</a></li>
                         <li><a class="toggle" href="#preferenceBloc">{function="_t('PREFERENCES')"}</a></li>
-                        <li><a class="toggle" href="#adminBloc">{function="_t('ADMINISTRATION')"}</a></li>
+                        {if="$isAdmin"}
+                            <li><a class="toggle" href="#adminBloc">{function="_t('ADMINISTRATION')"}</a></li>
+                        {/if}
                         <li><a class="toggle" href="#usersBloc">{function="_t('USERS')"}</a></li>
                         <li><a class="toggle" href="#importBloc">{function="_t('IMPORT')"}</a></li>
                         <li><a class="toggle" href="#exportBloc">{function="_t('EXPORT')"}</a></li>
@@ -228,67 +230,69 @@
                 </section>
             {/if}
 
-            <section class="adminBloc">
-                <form method="POST" action="action.php?action=updateConfiguration">
-                    <h2>{function="_t('ADMINISTRATION')"} :</h2>
-                    <section>
-                        <h3>{function="_t('GENERALITY')"}</h3>
-                        <p><label for="root">{function="_t('PROJECT_ROOT')"} :</label> <input type="text" id="root" name="root" value="{$root}"></p>
-                        <h4 class="settings-comment">{function="_t('LET_SLASH_AT_END')"}</h4>
-                        <fieldset>
-                            <!-- DEBUG <img id="qrCodeOtp" class="qrcodeOtp" src="../../qrcode.php?qr&label={$myUser->getOtpSecret()}&user=DEBUG%20{$myUser->getLogin()}&key={$myUser->getOtpSecret()}&issuer={$serviceUrl}&algorithm=sha1&digits=8&period=30&_qrSize=4&_qrMargin=1"/> -->
-                            {if="extension_loaded('gd')"}
-                            <img id="qrCodeOtp" class="qrcodeOtp" src="../../qrcode.php?qr&label={$serviceUrl}&user={$myUser->getLogin()}&key={$myUser->getOtpSecret()}&issuer={$serviceUrl}&algorithm=sha1&digits=8&period=30&_qrSize=4&_qrMargin=1"/>
-                            {else}
-                            <img id="qrCodeOtp" class="qrcodeOtp" src="images/QRcode-PhpGdLibraryRequired.png"/>
-                            {/if}
-                            <legend>{function="_t('OTP_SETTINGS')"}</legend>
-                            <input type="radio" {if="$otpEnabled"} checked="checked" {/if} value="1" id="otpEnabledYes" name="otpEnabled" /><label for="otpEnabledYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="!$otpEnabled"} checked="checked" {/if} value="0" id="otpEnabledNo" name="otpEnabled" /><label for="otpEnabledNo">{function="_t('NO')"}</label>
-                            <p>{function="_t('OTP_SETTINGS_DESC')"}{$myUser->getOtpKey()}.</p>
-                        <p><label for="otpSecret">{function="_t('OTP_SECRET')"} :</label> <input type="text" id="otpSecret" name="otpSecret" autocomplete="off" placeholder="{function="_t('OTP_DISABLED_EMPTY')"}" value="{$myUser->getOtpSecret()}">
-                        <i class="icon-random-otp" data-otp-generate="#otpSecret" data-otp-qrcode="#qrCodeOtp" title="Random OTP secret"></i>
-                        </p>
-                        </fieldset>
-                    </section>
-                    <section>
-                        <h3>{function="_t('SYNCHRONISATION')"}</h3>
-                        <p><input type="radio"  {if="$synchronisationType=='auto'"} checked="checked" {/if} value="auto" id="synchronisationTypeComplete" name="synchronisationType"> <label for="synchronisationTypeComplete"><strong>
-                            {function="_t('AUTOMATIC_FULL')"} :</strong></label> {function="_t('AUTOMATIC_FULL_DESC')"}</p>
-                        <p><input type="radio" {if=" $synchronisationType=='graduate'"} checked="checked" {/if}  value="graduate" id="synchronisationTypeGraduated" name="synchronisationType"> <label for="synchronisationTypeGraduated"><strong>{function="_t('AUTOMATIC_GRADUATE')"} :</strong></label> {function="_t('AUTOMATIC_GRADUATE_DESC')"}</p>
-                        {function="Plugin::callHook("setting_post_synchronisation_options", array($synchronisationType))"}
+            {if="$isAdmin"}
+                <section class="adminBloc">
+                    <form method="POST" action="action.php?action=updateConfiguration">
+                        <h2>{function="_t('ADMINISTRATION')"} :</h2>
+                        <section>
+                            <h3>{function="_t('GENERALITY')"}</h3>
+                            <p><label for="root">{function="_t('PROJECT_ROOT')"} :</label> <input type="text" id="root" name="root" value="{$root}"></p>
+                            <h4 class="settings-comment">{function="_t('LET_SLASH_AT_END')"}</h4>
+                            <fieldset>
+                                <!-- DEBUG <img id="qrCodeOtp" class="qrcodeOtp" src="../../qrcode.php?qr&label={$myUser->getOtpSecret()}&user=DEBUG%20{$myUser->getLogin()}&key={$myUser->getOtpSecret()}&issuer={$serviceUrl}&algorithm=sha1&digits=8&period=30&_qrSize=4&_qrMargin=1"/> -->
+                                {if="extension_loaded('gd')"}
+                                <img id="qrCodeOtp" class="qrcodeOtp" src="../../qrcode.php?qr&label={$serviceUrl}&user={$myUser->getLogin()}&key={$myUser->getOtpSecret()}&issuer={$serviceUrl}&algorithm=sha1&digits=8&period=30&_qrSize=4&_qrMargin=1"/>
+                                {else}
+                                <img id="qrCodeOtp" class="qrcodeOtp" src="images/QRcode-PhpGdLibraryRequired.png"/>
+                                {/if}
+                                <legend>{function="_t('OTP_SETTINGS')"}</legend>
+                                <input type="radio" {if="$otpEnabled"} checked="checked" {/if} value="1" id="otpEnabledYes" name="otpEnabled" /><label for="otpEnabledYes">{function="_t('YES')"}</label>
+                                <input type="radio" {if="!$otpEnabled"} checked="checked" {/if} value="0" id="otpEnabledNo" name="otpEnabled" /><label for="otpEnabledNo">{function="_t('NO')"}</label>
+                                <p>{function="_t('OTP_SETTINGS_DESC')"}{$myUser->getOtpKey()}.</p>
+                            <p><label for="otpSecret">{function="_t('OTP_SECRET')"} :</label> <input type="text" id="otpSecret" name="otpSecret" autocomplete="off" placeholder="{function="_t('OTP_DISABLED_EMPTY')"}" value="{$myUser->getOtpSecret()}">
+                            <i class="icon-random-otp" data-otp-generate="#otpSecret" data-otp-qrcode="#qrCodeOtp" title="Random OTP secret"></i>
+                            </p>
+                            </fieldset>
+                        </section>
+                        <section>
+                            <h3>{function="_t('SYNCHRONISATION')"}</h3>
+                            <p><input type="radio"  {if="$synchronisationType=='auto'"} checked="checked" {/if} value="auto" id="synchronisationTypeComplete" name="synchronisationType"> <label for="synchronisationTypeComplete"><strong>
+                                {function="_t('AUTOMATIC_FULL')"} :</strong></label> {function="_t('AUTOMATIC_FULL_DESC')"}</p>
+                            <p><input type="radio" {if=" $synchronisationType=='graduate'"} checked="checked" {/if}  value="graduate" id="synchronisationTypeGraduated" name="synchronisationType"> <label for="synchronisationTypeGraduated"><strong>{function="_t('AUTOMATIC_GRADUATE')"} :</strong></label> {function="_t('AUTOMATIC_GRADUATE_DESC')"}</p>
+                            {function="Plugin::callHook("setting_post_synchronisation_options", array($synchronisationType))"}
 
-                        <p><strong>{function="_t('SYNCHRONISATION_CODE')"} :</strong>
-                        {$synchronisationCode}
-                        </p>
-                        <p><strong>{function="_t('SYNCHRONISATION_OPTION')"}</strong>
-                        <fieldset>
-                            <legend>{function="_t('ENABLE_CACHE')"}</legend>
-                            <input type="radio" {if="$synchronisationEnableCache"} checked="checked" {/if} value="1" id="synchronisationEnableCacheYes" name="synchronisationEnableCache" /><label for="synchronisationEnableCacheYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="!$synchronisationEnableCache"} checked="checked" {/if} value="0" id="synchronisationEnableCacheNo" name="synchronisationEnableCache" /><label for="synchronisationEnableCacheNo">{function="_t('NO')"}</label>
-                            <p>{function="_t('ENABLE_CACHE_DESC')"}</p>
-                        </fieldset>
-                        <fieldset>
-                            <legend>{function="_t('FORCE_INTEGRATION')"}</legend>
-                            <input type="radio" {if="$synchronisationForceFeed"} checked="checked" {/if} value="1" id="synchronisationForceFeedYes" name="synchronisationForceFeed" /><label for="synchronisationForceFeedYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="!$synchronisationForceFeed"} checked="checked" {/if} value="0" id="synchronisationForceFeedNo" name="synchronisationForceFeed" /><label for="synchronisationForceFeedNo">{function="_t('NO')"}</label>
-                            <p>{function="_t('FORCE_INTEGRATION_DESC')"}</p>
-                        </fieldset>
-                        </p>
-                        <fieldset>
-                            <legend>{function="_t('ALLOW_ANONYMOUS_READ')"}</legend>
-                            <input type="radio" {if="$articleDisplayAnonymous=='1'"} checked="checked" {/if} value="1" id="articleDisplayAnonymousYes" name="articleDisplayAnonymous" /><label for="articleDisplayAnonymousYes">{function="_t('YES')"}</label>
-                            <input type="radio" {if="$articleDisplayAnonymous=='0'"} checked="checked" {/if} value="0" id="articleDisplayAnonymousNo" name="articleDisplayAnonymous" /><label for="articleDisplayAnonymousNo">{function="_t('NO')"}</label>
-                            <h4 class="settings-comment">{function="_t('ALLOW_ANONYMOUS_READ_DESC')"}</h4>
-                        </fieldset>
-                        <fieldset>
-                            <legend>{function="_t('KEEP_LAST_X_EVENTS_FEED',array('<input type="text" value="'.$feedMaxEvents.'" name="feedMaxEvents" size="4" />'))"}</legend>
-                            <h4 class="settings-comment">{function="_t('KEEP_LAST_X_EVENTS_FEED_DESC')"}</h4>
-                        </fieldset>
-                    </section>
-                    <button name="installButton">{function="_t('SAVE')"}</button>
-                </form>
-            </section>
+                            <p><strong>{function="_t('SYNCHRONISATION_CODE')"} :</strong>
+                            {$synchronisationCode}
+                            </p>
+                            <p><strong>{function="_t('SYNCHRONISATION_OPTION')"}</strong>
+                            <fieldset>
+                                <legend>{function="_t('ENABLE_CACHE')"}</legend>
+                                <input type="radio" {if="$synchronisationEnableCache"} checked="checked" {/if} value="1" id="synchronisationEnableCacheYes" name="synchronisationEnableCache" /><label for="synchronisationEnableCacheYes">{function="_t('YES')"}</label>
+                                <input type="radio" {if="!$synchronisationEnableCache"} checked="checked" {/if} value="0" id="synchronisationEnableCacheNo" name="synchronisationEnableCache" /><label for="synchronisationEnableCacheNo">{function="_t('NO')"}</label>
+                                <p>{function="_t('ENABLE_CACHE_DESC')"}</p>
+                            </fieldset>
+                            <fieldset>
+                                <legend>{function="_t('FORCE_INTEGRATION')"}</legend>
+                                <input type="radio" {if="$synchronisationForceFeed"} checked="checked" {/if} value="1" id="synchronisationForceFeedYes" name="synchronisationForceFeed" /><label for="synchronisationForceFeedYes">{function="_t('YES')"}</label>
+                                <input type="radio" {if="!$synchronisationForceFeed"} checked="checked" {/if} value="0" id="synchronisationForceFeedNo" name="synchronisationForceFeed" /><label for="synchronisationForceFeedNo">{function="_t('NO')"}</label>
+                                <p>{function="_t('FORCE_INTEGRATION_DESC')"}</p>
+                            </fieldset>
+                            </p>
+                            <fieldset>
+                                <legend>{function="_t('ALLOW_ANONYMOUS_READ')"}</legend>
+                                <input type="radio" {if="$articleDisplayAnonymous=='1'"} checked="checked" {/if} value="1" id="articleDisplayAnonymousYes" name="articleDisplayAnonymous" /><label for="articleDisplayAnonymousYes">{function="_t('YES')"}</label>
+                                <input type="radio" {if="$articleDisplayAnonymous=='0'"} checked="checked" {/if} value="0" id="articleDisplayAnonymousNo" name="articleDisplayAnonymous" /><label for="articleDisplayAnonymousNo">{function="_t('NO')"}</label>
+                                <h4 class="settings-comment">{function="_t('ALLOW_ANONYMOUS_READ_DESC')"}</h4>
+                            </fieldset>
+                            <fieldset>
+                                <legend>{function="_t('KEEP_LAST_X_EVENTS_FEED',array('<input type="text" value="'.$feedMaxEvents.'" name="feedMaxEvents" size="4" />'))"}</legend>
+                                <h4 class="settings-comment">{function="_t('KEEP_LAST_X_EVENTS_FEED_DESC')"}</h4>
+                            </fieldset>
+                        </section>
+                        <button name="installButton">{function="_t('SAVE')"}</button>
+                    </form>
+                </section>
+            {/if}
 
                 <section class="usersBloc">
                     <h2>{function="_t('USERS')"}</h2>

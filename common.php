@@ -106,6 +106,9 @@ $tpl->assign('articleDisplayAnonymous',$articleDisplayAnonymous);
 $isAlwaysDisplayed = ($articleDisplayAnonymous=='1') || ($myUser!=false);
 $tpl->assign('isAlwaysDisplayed',$isAlwaysDisplayed);
 
+$isAdmin = $myUser && ( (int) $myUser->getId() === 1 );
+$tpl->assign('isAdmin',$isAdmin);
+
 //Récuperation et sécurisation de toutes les variables POST et GET
 $_ = array();
 foreach($_POST as $key=>$val){
