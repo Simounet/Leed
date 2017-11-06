@@ -153,8 +153,7 @@ class User extends MysqlEntity{
     protected function cleanSideTables($userId) {
         $this->cleanFolder($userId);
         $this->cleanFeed($userId);
-        // @TODO Multiuser
-        // $this->cleanUserConfig($userId);
+        $this->cleanUserConfiguration($userId);
     }
 
     protected function cleanFolder($userId) {
@@ -165,6 +164,11 @@ class User extends MysqlEntity{
     protected function cleanFeed($userId) {
         $feedManager = new Feed();
         $feedManager->delete(array('userid' => $userId));
+    }
+
+    protected function cleanUserConfiguration($userId) {
+        $userConfigurationManager = new UserConfiguration();
+        $userConfigurationManager->delete(array('userid' => $userId));
     }
 
     public function createDefaultFolder() {
