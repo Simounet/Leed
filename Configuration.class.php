@@ -24,6 +24,7 @@ class Configuration extends MysqlEntity{
     );
 
     protected $options = array(
+        'articleDisplayAnonymous' => '0',
         'feedMaxEvents' => '50',
         'syncGradCount' => '10',
         'synchronisationCode' => '',

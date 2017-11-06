@@ -24,7 +24,6 @@ class UserConfiguration extends Configuration{
     );
 
     protected $options = array(
-        'articleDisplayAnonymous' => '0',
         'articleDisplayAuthor' => '1',
         'articleDisplayDate' => '1',
         'articleDisplayFolderSort' => '1',
