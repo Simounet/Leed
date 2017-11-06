@@ -17,16 +17,16 @@
                         <li><a class="toggle" href="#manageBloc">{function="_t('FEED_MANAGING')"}</a></li>
                         <li><a class="toggle" href="#synchronizeBloc">{function="_t('MANUAL_FEED_UPDATE')"}</a></li>
                         <li><a class="toggle" href="#preferenceBloc">{function="_t('PREFERENCES')"}</a></li>
-                        {if="$isAdmin"}
-                            <li><a class="toggle" href="#adminBloc">{function="_t('ADMINISTRATION')"}</a></li>
-                        {/if}
                         <li><a class="toggle" href="#usersBloc">{function="_t('USERS')"}</a></li>
                         <li><a class="toggle" href="#importBloc">{function="_t('IMPORT')"}</a></li>
                         <li><a class="toggle" href="#exportBloc">{function="_t('EXPORT')"}</a></li>
                         <li><a class="toggle" href="#bookBloc">{function="_t('BOOKMARKLET')"}</a></li>
                         <li><a class="toggle" href="#pluginBloc">{function="_t('AVAILABLES_PLUGINS')"}</a></li>
-                        <li class="pointer" onclick="if(confirm('{function="_t('CONFIRM_TRASH_EVENTS')"}')){window.location='action.php?action=purgeEvents';}">{function="_t('TRASH_EVENTS')"}</li>
-                        <li class="pointer" onclick="if(confirm('{function="_t('CONFIRM_TRASH_CACHE')"}')){window.location='action.php?action=purgeCache';}">{function="_t('TRASH_CACHE')"}</li>
+                        {if="$isAdmin"}
+                            <li><a class="toggle" href="#adminBloc">{function="_t('ADMINISTRATION')"}</a></li>
+                            <li class="pointer" onclick="if(confirm('{function="_t('CONFIRM_TRASH_EVENTS')"}')){window.location='action.php?action=purgeEvents';}">{function="_t('TRASH_EVENTS')"}</li>
+                            <li class="pointer" onclick="if(confirm('{function="_t('CONFIRM_TRASH_CACHE')"}')){window.location='action.php?action=purgeCache';}">{function="_t('TRASH_CACHE')"}</li>
+                        {/if}
                     </ul>
                     <h3>{function="_t('PLUGINS_INSTALLED')"}</h3>
                     <ul>
