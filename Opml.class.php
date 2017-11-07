@@ -126,7 +126,7 @@ class Opml  {
          */
     }
 
-    protected function importRec($folder, $folderId=1){
+    protected function importRec($userId, $folder, $folderId=1){
         $folderManager = new Folder();
         $feedManager = new Feed();
         foreach($folder as $item) {
@@ -137,9 +137,10 @@ class Opml  {
                 $folder = (!$folder?new Folder():$folder);
                 $folder->setName($item[$feedName]);
                 $folder->setParent(($folderId==1?-1:$folderId));
+                $folder->setUserid($userId);
                 $folder->setIsopen(0);
                 if($folder->getId()=='') $folder->save();
-                $this->importRec($item->outline,$folder->getId());
+                $this->importRec($userId, $item->outline,$folder->getId());
             } else { // un flux
                 $newFeed = $feedManager->load(array('url'=>$item[0]['xmlUrl']));
                 $newFeed = (!$newFeed?new Feed():$newFeed);
@@ -147,6 +148,7 @@ class Opml  {
                     /* Ne télécharge pas à nouveau le même lien, même s'il est
                        dans un autre dossier. */
                     $newFeed->setName($item[0][$feedName]);
+                    $newFeed->setUserid($userId);
                     $newFeed->setUrl($item[0]['xmlUrl']);
                     $newFeed->setDescription($item[0]['description']);
                     $newFeed->setWebsite($item[0]['htmlUrl']);
@@ -167,9 +169,8 @@ class Opml  {
     /**
      * Importe les flux.
      */
-    function import() {
+    function import($userId, $file) {
         require_once("SimplePie.class.php");
-        $file = $_FILES['newImport']['tmp_name'];
         $internalErrors = libxml_use_internal_errors(true);
         $xml = @simplexml_load_file($file);
         $errorOutput = array();
@@ -179,7 +180,7 @@ class Opml  {
         libxml_clear_errors();
         libxml_use_internal_errors($internalErrors);
         if (!empty($xml) && empty($errorOutput)) {
-            $this->importRec($xml->body->outline);
+            $this->importRec($userId, $xml->body->outline);
         }
         return $errorOutput;
     }
