@@ -424,7 +424,7 @@ switch ($action){
         define('RESET_PASSWORD_FILE', 'resetPassword');
         if (file_exists(RESET_PASSWORD_FILE)) {
             /* Pour réinitialiser le mot de passe :
-             * créer le fichier RESET_PASSWORD_FILE vide.
+             * créer le fichier resetPassword vide.
              * Le nouveau mot de passe sera celui fourni à la connexion.
              */
             @unlink(RESET_PASSWORD_FILE);
@@ -432,15 +432,8 @@ switch ($action){
                 $message = 'Unable to remove "'.RESET_PASSWORD_FILE.'"!';
                 /* Pas supprimable ==> on ne remet pas à zéro */
             } else {
-                $resetPassword = $_['password'];
-                assert('!empty($resetPassword)');
-                $tmpUser = User::get($_['login']);
-                if (false===$tmpUser) {
-                    $message = "Unknown user '{$_['login']}'! No password reset.";
-                } else {
-                    $tmpUser->resetPassword($resetPassword, $userConfigurationManager->get('cryptographicSalt'));
-                    $message = "User '{$_['login']}' (id={$tmpUser->getId()}) Password reset to '$resetPassword'.";
-                }
+                $resetPassword = isset($_['password']) ? $_['password'] : false;
+                $message = $userManager->resetPassword($_['login'], $resetPassword);
             }
             error_log($message);
         }
@@ -572,6 +565,17 @@ switch ($action){
         $user->remove($userId);
         header('location: ./settings.php#usersBloc');
         break;
+
+    case 'resetPasswordUser':
+        if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
+        $userId = isset($_['user-reset-password-id']) ? $_['user-reset-password-id'] : false;
+        if($userId === false) {
+            header('location: ./settings.php#usersBloc');
+        }
+        $password = isset($_['user-reset-password']) ? $_['user-reset-password'] : false;
+        $userManager->changePassword($userId, $password);
+        header('location: ./settings.php#usersBloc');
+    break;
 
     default:
         require_once("SimplePie.class.php");

@@ -302,6 +302,17 @@
                         <input type="password" name="password" pattern="^[a-zA-Z0-9]{1}[a-zA-Z0-9\-]{1,25}[a-zA-Z0-9]{1}$">
                         <button type="submit">{function="_t('ADD')"}</button>
                     </form>
+                    <form action="./action.php?action=resetPasswordUser" method="post">
+                        <h3>{function="_t('USER_RESET_PASSWORD')"}</h3>
+                        <select id="user-reset-password-id" name="user-reset-password-id">
+                            <option value="" selected disabled hidden></option>
+                            {loop="$userList"}
+                                <option value="{$value->getId()}">{$value->getLogin()}</option>
+                            {/loop}
+                        </select>
+                        <input type="password" name="user-reset-password" />
+                        <button type="submit">{function="_t('SAVE')"}</button>
+                    </form>
                     <form action="./action.php?action=delUser" method="post">
                         <h3>{function="_t('USER_LIST')"}</h3>
                         <ul>

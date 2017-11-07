@@ -54,7 +54,7 @@ class User extends MysqlEntity{
     function exist($login,$password,$otpEntered=Null){
         $userManager = new User();
         // @TODO à gérer dans MysqlEntity
-        $query = 'SELECT * FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` WHERE password=SHA1(CONCAT("' . $password . '", cryptographicSalt))';
+        $query = 'SELECT * FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` WHERE password=SHA1(CONCAT("' . $password . '", cryptographicSalt)) AND login="' . $login . '"';
         $result = $this->customQuery($query);
         $users = $this->getObjectsFromQuery($result);
         $user = count($users) > 0 ? $users[0] : false;
@@ -217,6 +217,20 @@ class User extends MysqlEntity{
         return $this->customQuery($query);
     }
 
+    public function resetPassword($login, $resetPassword){
+        assert('!empty($resetPassword)');
+        $tmpUser = User::get($login);
+        if (false===$tmpUser) {
+            $message = "Unknown user '{$login}'! No password reset.";
+        } else {
+            $tmpUser->setPassword($resetPassword, $tmpUser->getCryptographicSalt());
+            $tmpUser->setOtpSecret('');
+            $tmpUser->save();
+            $message = "User '{$login}' (id={$tmpUser->getId()}) Password reset.";
+        }
+        return $message;
+    }
+
     protected function generateSalt() {
         return ''.mt_rand().mt_rand();
     }
@@ -268,12 +282,6 @@ class User extends MysqlEntity{
 
     function setOtpSecret($otpSecret){
         $this->otpSecret = $otpSecret;
-    }
-
-    function resetPassword($resetPassword, $salt=''){
-        $this->setPassword($resetPassword, $salt);
-        $this->otpSecret = '';
-        $this->save();
     }
 
 }
