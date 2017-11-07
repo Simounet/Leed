@@ -227,7 +227,7 @@ switch ($action){
         $opml = new Opml();
         echo "<h3>"._t('IMPORT')."</h3><p>"._t('PENDING')."</p>\n";
         try {
-            $errorOutput = $opml->import($_FILES['newImport']['tmp_name']);
+            $errorOutput = $opml->import($myUser->getId(), $_FILES['newImport']['tmp_name']);
         } catch (Exception $e) {
             $errorOutput = array($e->getMessage());
         }
