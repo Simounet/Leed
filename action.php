@@ -137,23 +137,7 @@ switch ($action){
         $userConfigurationManager->put('articleDisplayMode',$_['articleDisplayMode']);
         $userConfigurationManager->put('language',$_['ChgLanguage']);
         $userConfigurationManager->put('theme',$_['ChgTheme']);
-        if(trim($_['password'])!='') {
-            $salt = User::generateSalt();
-            $userManager->change(array('password'=>User::encrypt($_['password'], $salt)),array('id'=>$myUser->getId()));
-            /* /!\ En multi-utilisateur, il faudra changer l'information au
-            niveau du compte lui-même et non au niveau du déploiement comme
-            ici. C'est ainsi parce que c'est plus efficace de stocker le sel
-            dans la config que dans le fichier de constantes, difficile à
-            modifier. */
-            $oldSalt = $userConfigurationManager->get('cryptographicSalt');
-            if (empty($oldSalt)) {
-                /* Pendant la migration à ce système, les déploiements
-                ne posséderont pas cette donnée. */
-                $userConfigurationManager->add('cryptographicSalt', $salt);
-            } else {
-                $userConfigurationManager->change(array('value'=>$salt), array('key'=>'cryptographicSalt'));
-            }
-        }
+        $userManager->changePassword($myUser->getId(), $_['password']);
         header('location: ./settings.php#preferenceBloc');
     break;
 
@@ -471,9 +455,7 @@ switch ($action){
                 exit();
             }
         }else{
-            $salt = $userConfigurationManager->get('cryptographicSalt');
-            if (empty($salt)) $salt = '';
-            $user = $userManager->exist($_['login'],$_['password'],$salt,@$_['otp']);
+            $user = $userManager->exist($_['login'],$_['password'],@$_['otp']);
             if($user==false){
                 error_log("Leed: wrong login for '".$_['login']."'");
                 header('location: ./index.php?action=wrongLogin');

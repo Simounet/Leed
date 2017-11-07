@@ -22,7 +22,6 @@ class Install {
             'mysqlPrefix' => self::DEFAULT_TABLES_PREFIX
         )
     );
-    protected $salt;
 
 
     public function __construct() {
@@ -115,7 +114,6 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
         }
         $userConfigurationManager->create();
         $userConfigurationManager->setDefaults();
-        $this->salt = $userConfigurationManager->get('cryptographicSalt');
     }
 
     protected function createUser() {
@@ -124,7 +122,7 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
             $userManager->truncate();
         }
         $userManager->create();
-        $userManager->add($this->options['user']['login'], $this->options['user']['password'], $this->salt, $this->logger);
+        $userManager->add($this->options['user']['login'], $this->options['user']['password'], $this->logger);
         $this->createSideTables();
         $userManager->createDefaultFolder();
         $_SESSION['currentUser'] = serialize($userManager->get($this->options['user']['login']));

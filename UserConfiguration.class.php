@@ -31,7 +31,6 @@ class UserConfiguration extends Configuration{
         'articleDisplayLink' => '1',
         'articleDisplayMode' => 'summary',
         'articlePerPages' => '5',
-        'cryptographicSalt' => '',
         'displayOnlyUnreadFeedFolder' => 'false',
         'language' => 'en',
         'optionFeedIsVerbose' => 1,
@@ -91,19 +90,12 @@ class UserConfiguration extends Configuration{
                 case 'theme':
                     $value = isset($_POST['template']) ? $_POST['template'] : $defaultValue;
                     break;
-                case 'cryptographicSalt':
-                    $value = $this->generateSalt();
-                    break;
                 default:
                     $value = $defaultValue;
                     break;
             }
             $this->add($option, $value);
         }
-    }
-
-    protected function generateSalt() {
-        return ''.mt_rand().mt_rand();
     }
 
     public function getUserid(){

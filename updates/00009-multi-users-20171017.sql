@@ -37,5 +37,9 @@ INSERT INTO `##MYSQL_PREFIX##user_configuration` (`userid`, `key`, `value`)
     SELECT 1, `key`, `value`
     FROM `##MYSQL_PREFIX##configuration`
     WHERE `key`
-    IN( "articleDisplayAuthor", "articleDisplayDate", "articleDisplayFolderSort", "articleDisplayHomeSort", "articleDisplayLink", "articleDisplayMode", "articlePerPages", "displayOnlyUnreadFeedFolder", "language", "theme", "cryptographicSalt", "optionFeedIsVerbose");
-DELETE FROM `##MYSQL_PREFIX##configuration` WHERE `key` IN("articleDisplayAuthor", "articleDisplayDate", "articleDisplayFolderSort", "articleDisplayHomeSort", "articleDisplayLink", "articleDisplayMode", "articlePerPages", "displayOnlyUnreadFeedFolder", "language", "theme", "cryptographicSalt", "optionFeedIsVerbose");
+    IN( "articleDisplayAuthor", "articleDisplayDate", "articleDisplayFolderSort", "articleDisplayHomeSort", "articleDisplayLink", "articleDisplayMode", "articlePerPages", "displayOnlyUnreadFeedFolder", "language", "theme", "optionFeedIsVerbose");
+DELETE FROM `##MYSQL_PREFIX##configuration` WHERE `key` IN("articleDisplayAuthor", "articleDisplayDate", "articleDisplayFolderSort", "articleDisplayHomeSort", "articleDisplayLink", "articleDisplayMode", "articlePerPages", "displayOnlyUnreadFeedFolder", "language", "theme", "optionFeedIsVerbose");
+
+ALTER TABLE `##MYSQL_PREFIX##user` ADD `cryptographicSalt` varchar(255) NOT NULL;
+UPDATE `##MYSQL_PREFIX##user` AS user INNER JOIN `##MYSQL_PREFIX##configuration` AS conf ON( conf.key="cryptographicSalt" ) SET user.cryptographicSalt=conf.value;
+DELETE FROM `##MYSQL_PREFIX##configuration` WHERE `key`="cryptographicSalt";

@@ -12,13 +12,14 @@ class User extends MysqlEntity{
     const OTP_DIGITS   = 8;
     const OTP_DIGEST   = 'sha1';
 
-    protected $id,$login,$password,$otpSecret;
+    protected $id,$login,$password,$cryptographicSalt,$otpSecret;
     protected $TABLE_NAME = 'user';
     protected $object_fields =
     array(
         'id'=>'key',
         'login'=>'string',
         'password'=>'string',
+        'cryptographicSalt' => 'string',
         'otpSecret'=>'string',
     );
 
@@ -50,9 +51,13 @@ class User extends MysqlEntity{
         return str_pad($otp->now(), $otp->digits, '0', STR_PAD_LEFT);
     }
 
-    function exist($login,$password,$salt='',$otpEntered=Null){
+    function exist($login,$password,$otpEntered=Null){
         $userManager = new User();
-        $user = $userManager->load(array('login'=>$login,'password'=>User::encrypt($password,$salt)));
+        // @TODO à gérer dans MysqlEntity
+        $query = 'SELECT * FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` WHERE password=SHA1(CONCAT("' . $password . '", cryptographicSalt))';
+        $result = $this->customQuery($query);
+        $users = $this->getObjectsFromQuery($result);
+        $user = count($users) > 0 ? $users[0] : false;
 
         if (false!=$user) {
             $otpSecret = $user->otpSecret;
@@ -84,7 +89,7 @@ class User extends MysqlEntity{
         return sha1($this->password.$this->login);
     }
 
-    public function add($login = false, $password = false, $salt = false, $logger = false) {
+    public function add($login = false, $password = false, $logger = false) {
         if(!$logger) {
             require_once('Logger.class.php');
             $logger = new Logger('settings');
@@ -106,7 +111,8 @@ class User extends MysqlEntity{
             return false;
         }
         $this->setLogin($login);
-        $this->setPassword($password, $salt);
+        $this->setCryptographicSalt($this->generateSalt());
+        $this->setPassword($password, $this->getCryptographicSalt());
         $this->save();
         $this->createDefaultFolder();
         $this->createDefaultUserConfiguration();
@@ -203,7 +209,15 @@ class User extends MysqlEntity{
         return $result;
     }
 
-    static function generateSalt() {
+    public function changePassword($userId, $password) {
+        if(trim($password) === '') {
+            return false;
+        }
+        $query = 'UPDATE `'.MYSQL_PREFIX.$this->TABLE_NAME.'` SET `password`=SHA1(CONCAT("' . $password . '", cryptographicSalt )) WHERE id=' . $userId;
+        return $this->customQuery($query);
+    }
+
+    protected function generateSalt() {
         return ''.mt_rand().mt_rand();
     }
 
@@ -234,6 +248,14 @@ class User extends MysqlEntity{
 
     function setPassword($password,$salt=''){
         $this->password = User::encrypt($password,$salt);
+    }
+
+    public function getCryptographicSalt() {
+        return $this->cryptographicSalt;
+    }
+
+    public function setCryptographicSalt($salt) {
+        $this->cryptographicSalt = $salt;
     }
 
     function getOtpSecret(){
