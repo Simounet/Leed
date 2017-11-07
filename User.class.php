@@ -221,6 +221,10 @@ class User extends MysqlEntity{
         return ''.mt_rand().mt_rand();
     }
 
+    protected function encrypt($password, $salt=''){
+        return sha1($password.$salt);
+    }
+
     function setStayConnected() {
         ///@TODO: set the current web directory, here and on del
         setcookie('leedStaySignedIn', $this->getToken(), time()+31536000);
@@ -247,7 +251,7 @@ class User extends MysqlEntity{
     }
 
     function setPassword($password,$salt=''){
-        $this->password = User::encrypt($password,$salt);
+        $this->password = $this->encrypt($password,$salt);
     }
 
     public function getCryptographicSalt() {
@@ -270,10 +274,6 @@ class User extends MysqlEntity{
         $this->setPassword($resetPassword, $salt);
         $this->otpSecret = '';
         $this->save();
-    }
-
-    static function encrypt($password, $salt=''){
-        return sha1($password.$salt);
     }
 
 }
