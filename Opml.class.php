@@ -14,15 +14,6 @@ class Opml  {
     public $alreadyKnowns = array();
 
     /**
-     * Met à jour les données des flux.
-     */
-    protected function update() {
-        global $feedManager, $folderManager;
-        $this->feeds = $feedManager->populate('name');
-        $this->folders = $folderManager->loadAll(array('parent'=>-1),'name');
-    }
-
-    /**
      * Convertit les caractères qui interfèrent avec le XML
      */
     protected function escapeXml($string) {
@@ -88,9 +79,19 @@ class Opml  {
     /**
      * Exporte l'ensemble des flux et sort les en-têtes.
      */
-    function export() {
-        $this->update();
+    function export($userId) {
+        $folderManager = new Folder();
+        $folders = $folderManager->loadAll(array('userid'=>$userId),'name');
         $date = date('D, d M Y H:i:s O');
+        $xmlStream = $this->getXmlStream($date, $folders);
+        $this->exportHeaders(strlen($xmlStream));
+        ob_clean();
+        flush();
+        echo $xmlStream;
+    }
+
+    protected function getXmlStream($date, $folders)
+    {
         $xmlStream = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <opml version=\"2.0\">
   <head>
@@ -99,9 +100,30 @@ class Opml  {
     <dateCreated>$date</dateCreated>
   </head>
   <body>\n";
-        $xmlStream .= $this->exportRecursive($this->folders, 2);
+        $xmlStream .= $this->exportRecursive($folders, 2);
         $xmlStream .= "  </body>\n</opml>\n";
         return $xmlStream;
+    }
+
+    protected function exportHeaders($contentLength)
+    {
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename=leed-'.date('d-m-Y').'.opml');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . $contentLength);
+        /*
+        //A decommenter dans le cas ou on a des pb avec ie
+        if(preg_match('/msie|(microsoft internet explorer)/i', $_SERVER['HTTP_USER_AGENT'])){
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        }else{
+        header('Pragma: no-cache');
+        }
+         */
     }
 
     protected function importRec($folder, $folderId=1){

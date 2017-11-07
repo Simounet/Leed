@@ -156,35 +156,10 @@ switch ($action){
 
 
     case 'exportFeed':
-        //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
-            /*********************/
-        /** Export **/
-        /*********************/
         if(isset($_POST['exportButton'])){
             $opml = new Opml();
-            $xmlStream = $opml->export();
-
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=leed-'.date('d-m-Y').'.opml');
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . strlen($xmlStream));
-            /*
-            //A decommenter dans le cas ou on a des pb avec ie
-            if(preg_match('/msie|(microsoft internet explorer)/i', $_SERVER['HTTP_USER_AGENT'])){
-              header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-              header('Pragma: public');
-            }else{
-              header('Pragma: no-cache');
-            }
-            */
-            ob_clean();
-            flush();
-            echo $xmlStream;
+            $opml->export($myUser->getId());
         }
     break;
 
