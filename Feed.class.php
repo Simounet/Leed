@@ -163,7 +163,10 @@ class Feed extends MysqlEntity{
 
             $event->setCategory($item->get_category());
             $event->save();
-            $newEventsIds[] = $event->getId();
+            $eventId = $event->getId();
+            if($eventId > 0) {
+                $newEventsIds[] = $eventId;
+            }
             $nbEvents++;
         }
         $this->eventsSubSave($this->url, $newEventsIds);
