@@ -113,15 +113,7 @@ switch ($action){
             $configurationManager->put('feedMaxEvents',$_['feedMaxEvents']);
             $configurationManager->put('otpEnabled',$_['otpEnabled']);
 
-            # Modifications dans la base de données, la portée courante et la sesssion
-            # @TODO: gérer cela de façon centralisée
-            $otpSecret = $_['otpSecret'];
-            if ($myUser->isOtpSecretValid($otpSecret)) {
-                $userManager->change(array('login'=>$_['login'], 'otpSecret'=>$otpSecret),array('id'=>$myUser->getId()));
-                $myUser->setLogin($_['login']);
-                $myUser->setOtpSecret($otpSecret);
-                $_SESSION['currentUser'] = serialize($myUser);
-            }
+            $myUser->changeOtpSecret($_['otpSecret']);
 
     header('location: ./settings.php#adminBloc');
     break;
