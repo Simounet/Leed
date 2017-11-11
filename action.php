@@ -111,9 +111,7 @@ switch ($action){
             $configurationManager->put('synchronisationEnableCache',$_['synchronisationEnableCache']);
             $configurationManager->put('synchronisationForceFeed',$_['synchronisationForceFeed']);
             $configurationManager->put('feedMaxEvents',$_['feedMaxEvents']);
-            $configurationManager->put('otpEnabled',$_['otpEnabled']);
 
-            $myUser->changeOtpSecret($_['otpSecret']);
 
     header('location: ./settings.php#adminBloc');
     break;
@@ -129,6 +127,8 @@ switch ($action){
         $userConfigurationManager->put('articleDisplayMode',$_['articleDisplayMode']);
         $userConfigurationManager->put('language',$_['ChgLanguage']);
         $userConfigurationManager->put('theme',$_['ChgTheme']);
+        $userConfigurationManager->put('otpEnabled',$_['otpEnabled']);
+        $myUser->changeOtpSecret($_['otpSecret']);
         $userManager->changePassword($myUser->getId(), $_['password']);
         header('location: ./settings.php#preferenceBloc');
     break;

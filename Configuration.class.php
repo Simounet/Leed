@@ -31,8 +31,7 @@ class Configuration extends MysqlEntity{
         'synchronisationEnableCache' => '0',
         'synchronisationForceFeed' => '0',
         'synchronisationType' => 'auto',
-        'root' => '',
-        'otpEnabled' => 0
+        'root' => ''
     );
 
     function __construct(){
