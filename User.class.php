@@ -51,6 +51,16 @@ class User extends MysqlEntity{
         return str_pad($otp->now(), $otp->digits, '0', STR_PAD_LEFT);
     }
 
+    public function changeOtpSecret($otpSecret) {
+        if (!$this->isOtpSecretValid($otpSecret)) {
+            return false;
+        }
+        $userManager = new self();
+        $userManager->change(array('otpSecret'=>$otpSecret),array('id'=>$this->getId()));
+        $this->setOtpSecret($otpSecret);
+        $_SESSION['currentUser'] = serialize($this);
+    }
+
     function exist($login,$password,$otpEntered=Null){
         $userManager = new User();
         // @TODO à gérer dans MysqlEntity
