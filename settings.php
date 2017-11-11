@@ -52,8 +52,6 @@ $tpl->assign('feedMaxEvents', $configurationManager->get('feedMaxEvents'));
 $tpl->assign('root', $configurationManager->get('root'));
 $tpl->assign('userList', $userManager->getUserList());
 
-$tpl->assign('otpEnabled', $configurationManager->get('otpEnabled'));
-
 //Suppression de l'état des plugins inexistants
 Plugin::pruneStates();
 

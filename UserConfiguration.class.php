@@ -34,6 +34,7 @@ class UserConfiguration extends Configuration{
         'displayOnlyUnreadFeedFolder' => 'false',
         'language' => 'en',
         'optionFeedIsVerbose' => 1,
+        'otpEnabled' => 0,
         'paginationScale' => 5,
         'theme' => 'marigolds'
     );
@@ -63,6 +64,12 @@ class UserConfiguration extends Configuration{
         unset($_SESSION[self::SESSION]);
     }
 
+    public function loadKey($key, $selectedUserId=false) {
+        $userId = $selectedUserId ? $selectedUserId : $this->getUserId();
+        $results = $this->loadAll(array('userid' => $userId , 'key' => $key));
+        return count($results) === 1 ? $results[0]->value : false;
+    }
+
     public function getAll(){
 
         if(!isset($_SESSION[self::SESSION])){
@@ -79,6 +86,11 @@ class UserConfiguration extends Configuration{
         }else{
             $this->confTab = unserialize($_SESSION[self::SESSION]);
         }
+    }
+
+    public function isOtpEnabledForOneUser() {
+        $usersWithOtpEnabled = $this->loadAll(array('key' => "otpenabled", "value" => 1));
+        return count($usersWithOtpEnabled) > 0;
     }
 
     public function setDefaults() {

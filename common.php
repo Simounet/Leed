@@ -108,6 +108,7 @@ $tpl->assign('isAlwaysDisplayed',$isAlwaysDisplayed);
 
 $isAdmin = $myUser && ( (int) $myUser->getId() === 1 );
 $tpl->assign('isAdmin',$isAdmin);
+$tpl->assign('otpEnabled', $userConfigurationManager->isOtpEnabledForOneUser());
 
 //Récuperation et sécurisation de toutes les variables POST et GET
 $_ = array();
