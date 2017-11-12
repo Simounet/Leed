@@ -78,6 +78,7 @@ $userId = $myUser ? $myUser->getId() : 1;
 $userConfigurationManager = new UserConfiguration($userId);
 $userConfigurationManager->getAll();
 $languages = $myUser ? array($userConfigurationManager->get('language')) : Translation::getHttpAcceptLanguages();
+$otpEnabled = $myUser ? $userConfigurationManager->get('otpEnabled') : 0;
 
 $theme = $userConfigurationManager->get('theme');
 
@@ -108,7 +109,8 @@ $tpl->assign('isAlwaysDisplayed',$isAlwaysDisplayed);
 
 $isAdmin = $myUser && ( (int) $myUser->getId() === 1 );
 $tpl->assign('isAdmin',$isAdmin);
-$tpl->assign('otpEnabled', $userConfigurationManager->isOtpEnabledForOneUser());
+$tpl->assign('otpEnabled', $otpEnabled);
+$tpl->assign('otpLoginEnabled', $userConfigurationManager->isOtpEnabledForOneUser());
 
 //Récuperation et sécurisation de toutes les variables POST et GET
 $_ = array();
