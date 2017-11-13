@@ -339,35 +339,29 @@ class Plugin{
         return (isset($states[$plugin])?$states[$plugin]:false);
     }
 
-    public static function changeState($plugin,$state){
-        $states = Plugin::getStates();
-        $states[$plugin] = $state;
-
-        Plugin::setStates($states);
-    }
-
-
-    public static function enabled($pluginUid){
-        $plugins = Plugin::getAll();
+    public function changeState($pluginUid, $state, $userId){
+        $plugins = $this->getAll();
+        $action = $this->getAction($state);
 
         foreach($plugins as $plugin){
             if($plugin->getUid()==$pluginUid){
-                Plugin::changeState($plugin->getPath(),true);
-                $install = dirname($plugin->getPath()).'/install.php';
-                if(file_exists($install))require_once($install);
+                $states = $this->getStates();
+                $states[$plugin->getPath()] = $action['state'];
+
+                $this->setStates($states);
+                $file = dirname($plugin->getPath()).'/' . $action['action'] . '.php';
+                if(file_exists($file))require_once($file);
             }
         }
     }
-    public static function disabled($pluginUid){
-        $plugins = Plugin::getAll();
-        foreach($plugins as $plugin){
-            if($plugin->getUid()==$pluginUid){
-                Plugin::changeState($plugin->getPath(),false);
-                $uninstall = dirname($plugin->getPath()).'/uninstall.php';
-                if(file_exists($uninstall))require_once($uninstall);
-            }
-        }
 
+    protected function getAction($dirtyState) {
+        $state = (int) $dirtyState === 1;
+        $action = $state ? 'install' : 'uninstall';
+        return array(
+            'state' => $state,
+            'action' => $action
+        );
     }
 
     function getUid(){

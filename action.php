@@ -435,13 +435,8 @@ switch ($action){
     case 'changePluginState':
         //@TODO Multiuser
         if($myUser==false) exit(_t('YOU_MUST_BE_CONNECTED_ACTION'));
-
-        if($_['state']=='0'){
-            Plugin::enabled($_['plugin']);
-
-        }else{
-            Plugin::disabled($_['plugin']);
-        }
+        $plugin = new Plugin();
+        $plugin->changeState($_['plugin'], $_['state']=='0', $myUser->getId());
         header('location: ./settings.php#pluginBloc');
     break;
 
