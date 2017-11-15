@@ -53,10 +53,10 @@ $tpl->assign('root', $configurationManager->get('root'));
 $tpl->assign('userList', $userManager->getUserList());
 
 //Suppression de l'état des plugins inexistants
-Plugin::pruneStates();
+$pluginManager->pruneStates();
 
 //Récuperation des plugins
-$tpl->assign('plugins',Plugin::getAll());
+$tpl->assign('plugins',$pluginManager->getAll());
 
 $view = "settings";
 require_once('footer.php'); ?>

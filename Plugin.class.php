@@ -28,9 +28,9 @@ class Plugin extends MysqlEntity{
         parent::__construct();
     }
 
-    public static function includeAll(){
+    public function includeAll(){
         global $i18n, $i18n_js, $theme;
-        $pluginFiles = Plugin::getFiles(true);
+        $pluginFiles = $this->getFiles(true);
         if(is_array($pluginFiles)) {
             foreach($pluginFiles as $pluginFile) {
                 // Chargement du fichier de Langue du plugin
@@ -50,7 +50,7 @@ class Plugin extends MysqlEntity{
         $i18n_js = $i18n->getJson();
     }
 
-    private static function getStates(){
+    protected function getStates(){
         $stateFile = dirname(__FILE__).Plugin::FOLDER.'/plugins.states.json';
         if(!file_exists($stateFile)) touch($stateFile);
         return json_decode(file_get_contents($stateFile),true);
@@ -59,8 +59,8 @@ class Plugin extends MysqlEntity{
         $stateFile = dirname(__FILE__).Plugin::FOLDER.'/plugins.states.json';
         file_put_contents($stateFile,json_encode($states));
     }
-    public static function pruneStates() {
-        $statesBefore = self::getStates();
+    public function pruneStates() {
+        $statesBefore = $this->getStates();
         if(empty($statesBefore))
             $statesBefore = array();
 
@@ -81,7 +81,7 @@ class Plugin extends MysqlEntity{
     }
 
 
-    private static function getObject($pluginFile){
+    protected function getObject($pluginFile){
         $plugin = new Plugin();
         $fileLines = file_get_contents($pluginFile);
 
@@ -115,7 +115,7 @@ class Plugin extends MysqlEntity{
         if(preg_match("#@description\s(.+)[\r\n]#", $fileLines, $match))
             $plugin->setDescription(trim($match[1]));
 
-        if(Plugin::loadState($pluginFile) || $plugin->getType()=='component'){
+        if($this->loadState($pluginFile) || $plugin->getType()=='component'){
             $plugin->setState(1);
         }else{
             $plugin->setState(0);
@@ -124,17 +124,17 @@ class Plugin extends MysqlEntity{
         return $plugin;
     }
 
-    public static function getAll(){
-        $pluginFiles = Plugin::getFiles();
+    public function getAll(){
+        $pluginFiles = $this->getFiles();
 
         $plugins = array();
         if(is_array($pluginFiles)) {
             foreach($pluginFiles as $pluginFile) {
-                $plugin = Plugin::getObject($pluginFile);
+                $plugin = $this->getObject($pluginFile);
                 $plugins[]=$plugin;
             }
         }
-        usort($plugins, "Plugin::sortPlugin");
+        usort($plugins, "self::sortPlugin");
         return $plugins;
     }
 
@@ -229,8 +229,9 @@ class Plugin extends MysqlEntity{
     }
 
     protected function getInstalledPluginsNames() {
+        $plugin = new self();
         $names = array();
-        $installedPlugins = self::getAll();
+        $installedPlugins = $plugin->getAll();
         if(!$installedPlugins || empty($installedPlugins)) {
             return $names;
         }
@@ -330,15 +331,15 @@ class Plugin extends MysqlEntity{
         }
     }
 
-    public static function getFiles($onlyActivated=false){
+    protected function getFiles($onlyActivated=false){
 
         $enabled = $disabled =  array();
-        $files = glob(dirname(__FILE__). Plugin::FOLDER .'/*/*.plugin*.php');
+        $files = glob(dirname(__FILE__). self::FOLDER .'/*/*.plugin*.php');
         if(empty($files))
             $files = array();
 
         foreach($files as $file){
-            $plugin = Plugin::getObject($file);
+            $plugin = $this->getObject($file);
             if($plugin->getState()){
                 $enabled [] =  $file;
             }else{
@@ -350,10 +351,9 @@ class Plugin extends MysqlEntity{
     }
 
 
-    public static function loadState($plugin){
-        global $myUser;
-        $userId = $myUser ? $myUser->getId() : 1;
-        $states = Plugin::getStates();
+    protected function loadState($plugin){
+        $userId = $this->getUserId();
+        $states = $this->getStates();
         return (isset($states[$userId]) && isset($states[$userId][$plugin])?$states[$userId][$plugin]:false);
     }
 
@@ -389,7 +389,7 @@ class Plugin extends MysqlEntity{
     }
 
 
-    static function sortPlugin($a, $b){
+    protected static function sortPlugin($a, $b){
         if ($a->getState() == $b->getState())
             if ($a->getName() == $b->getName())
                 return 0;

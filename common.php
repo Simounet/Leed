@@ -128,7 +128,7 @@ $tpl->assign('_',$_);
 $tpl->assign('action','');
 
 //Inclusion des plugins
-Plugin::includeAll();
+$pluginManager->includeAll();
 // pour inclure aussi les traductions des plugins dans les js
 $tpl->assign('i18n_js',$i18n_js);
 
