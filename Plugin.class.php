@@ -54,11 +54,13 @@ class Plugin{
         $error = false;
         if (is_array($statesBefore))
         {
-            foreach($statesBefore as $file=>$state) {
-                if (file_exists($file))
-                    $statesAfter[$file] = $state;
-                else
-                    $error = true;
+            foreach($statesBefore as $userId => $plugins) {
+                foreach($plugins as $file=>$state) {
+                    if (file_exists($file))
+                        $statesAfter[$file] = $state;
+                    else
+                        $error = true;
+                }
             }
         }
         if ($error) self::setStates($statesAfter);
@@ -335,8 +337,10 @@ class Plugin{
 
 
     public static function loadState($plugin){
+        global $myUser;
+        $userId = $myUser ? $myUser->getId() : 1;
         $states = Plugin::getStates();
-        return (isset($states[$plugin])?$states[$plugin]:false);
+        return (isset($states[$userId]) && isset($states[$userId][$plugin])?$states[$userId][$plugin]:false);
     }
 
     public function changeState($pluginUid, $state, $userId){
@@ -346,8 +350,7 @@ class Plugin{
         foreach($plugins as $plugin){
             if($plugin->getUid()==$pluginUid){
                 $states = $this->getStates();
-                $states[$plugin->getPath()] = $action['state'];
-
+                $states[$userId][$plugin->getPath()] = $action['state'];
                 $this->setStates($states);
                 $file = dirname($plugin->getPath()).'/' . $action['action'] . '.php';
                 if(file_exists($file))require_once($file);
