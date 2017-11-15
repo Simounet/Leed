@@ -399,5 +399,9 @@ class Functions
         }
     }
 
+    public static function endsWithSlash($string) {
+        return rtrim($string, '/') . '/';
     }
+
+}
 ?>

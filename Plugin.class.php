@@ -385,7 +385,11 @@ class Plugin{
             return $a->getState() < $b->getState() ? -1 : 1;
     }
 
-
+    public function executeUpdatesPatch($pluginPath) {
+        $update = new Update();
+        $update->setUpdatesPath($pluginPath);
+        $update->executePatch();
+    }
 
     function getName(){
         return $this->name;

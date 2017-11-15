@@ -7,13 +7,18 @@
  */
 
 class Update{
-    const FOLDER = '/updates';
+    const FOLDER = 'updates';
+    protected $updatesPath = "";
+
+    public function __construct() {
+        $this->setUpdatesPath(dirname(__FILE__));
+    }
 
     /**
      * Description : Récupération des fichiers déjà passés lors des anciennes mises à jour.
      */
     private function getUpdateFile(){
-        $updateFile = dirname(__FILE__).$this::FOLDER.'/update.json';
+        $updateFile = $this->getUpdatesPath().'update.json';
         if(!file_exists($updateFile)) {
             if (!touch($updateFile)) {
                 die ('Impossible d\'écrire dans le répertoire .'.dirname($updateFile).'. Merci d\'ajouter les droits necessaires.');
@@ -24,7 +29,7 @@ class Update{
     }
 
     private function addUpdateFile($addFile){
-        $updateFile = dirname(__FILE__).$this::FOLDER.'/update.json';
+        $updateFile = $this->getUpdatesPath().'update.json';
         $originFile = $this->getUpdateFile();
         if(empty($originFile))
             $originFile = array();
@@ -41,7 +46,12 @@ class Update{
      * Description : Permet de trouver les fichiers qui n'ont pas encore été joués
      */
     private function getNewPatch() {
-        $files = glob(dirname(__FILE__). $this::FOLDER .'/*.sql');
+        $folder = $this->getUpdatesPath();
+        $isFolderExists = file_exists($folder);
+        if(!$isFolderExists) {
+            return array();
+        }
+        $files = glob($folder .'*.sql');
         if(empty($files))
             $files = array();
 
@@ -76,7 +86,7 @@ class Update{
             Functions::purgeRaintplCache();
             foreach($newFilesForUpdate as $file){
                 // récupération du contenu du sql
-                $sql = file_get_contents(dirname(__FILE__).$this::FOLDER.'/'.$file);
+                $sql = file_get_contents($this->getUpdatesPath().$file);
 
                 $conn = MysqlConnector::getInstance()->connection;
                 //on sépare chaque requête par les ;
@@ -87,7 +97,7 @@ class Update{
                         //remplacement des préfixes de table
                         $val = str_replace('##MYSQL_PREFIX##',MYSQL_PREFIX,$val);
                         $result = $conn->query($val);
-                        $ficlog = dirname(__FILE__).$this::FOLDER.'/'.substr($file,0,strlen($file)-3).'log';
+                        $ficlog = $this->getUpdatesPath().substr($file,0,strlen($file)-3).'log';
                         if (false===$result) {
                             file_put_contents($ficlog, date('d/m/Y H:i:s').' : SQL : '.$val."\n", FILE_APPEND);
                             file_put_contents($ficlog, date('d/m/Y H:i:s').' : '.$conn->error."\n", FILE_APPEND);
@@ -107,6 +117,14 @@ class Update{
         $this->addUpdateFile(array($newFilesForUpdate));
 
         return true;
+    }
+
+    public function setUpdatesPath($updatesPath) {
+        $this->updatesPath = Functions::endsWithSlash($updatesPath) . $this::FOLDER . '/';
+    }
+
+    public function getUpdatesPath() {
+        return $this->updatesPath;
     }
 
 }
