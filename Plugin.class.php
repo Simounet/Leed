@@ -51,16 +51,20 @@ class Plugin extends MysqlEntity{
     }
 
     protected function getStates(){
-        $stateFile = dirname(__FILE__).Plugin::FOLDER.'/plugins.states.json';
-        if(!file_exists($stateFile)) touch($stateFile);
-        return json_decode(file_get_contents($stateFile),true);
+        $userId = $this->getUserid();
+        $enabled = array();
+        if($userId) {
+            $pluginsLoaded = $this->loadAll(array('userid' => $userId));
+            foreach($pluginsLoaded as $plugin) {
+                $enabled[$plugin->getName()] = 1;
+            }
+        }
+        return array($userId => $enabled);
     }
-    private static function setStates($states){
-        $stateFile = dirname(__FILE__).Plugin::FOLDER.'/plugins.states.json';
-        file_put_contents($stateFile,json_encode($states));
-    }
+
     public function pruneStates() {
-        $statesBefore = $this->getStates();
+        $plugin = new self();
+        $statesBefore = $plugin->getStates();
         if(empty($statesBefore))
             $statesBefore = array();
 
@@ -77,7 +81,8 @@ class Plugin extends MysqlEntity{
                 }
             }
         }
-        if ($error) self::setStates($statesAfter);
+        // @TODO Multiuser remove unknown plugins
+        // if ($error) self::setStates($statesAfter);
     }
 
 
@@ -352,33 +357,46 @@ class Plugin extends MysqlEntity{
 
 
     protected function loadState($plugin){
-        $userId = $this->getUserId();
+        $userId = $this->getUserid();
         $states = $this->getStates();
         return (isset($states[$userId]) && isset($states[$userId][$plugin])?$states[$userId][$plugin]:false);
     }
 
-    public function changeState($pluginUid, $state, $userId){
+    public function changeState($pluginUid, $state){
         $plugins = $this->getAll();
         $action = $this->getAction($state);
 
         foreach($plugins as $plugin){
-            if($plugin->getUid()==$pluginUid){
-                $states = $this->getStates();
-                $states[$userId][$plugin->getPath()] = $action['state'];
-                $this->setStates($states);
-                $file = dirname($plugin->getPath()).'/' . $action['action'] . '.php';
+            if($plugin->getUid()===$pluginUid){
+                $pluginPath = $plugin->getPath();
+                if($action === 'install') {
+                    $this->activate($pluginPath);
+                } else {
+                    $this->desactivate($pluginPath);
+                }
+                $file = dirname($pluginPath).'/' . $action . '.php';
                 if(file_exists($file))require_once($file);
             }
         }
     }
 
+    protected function activate($name) {
+        $plugin = new self();
+        $plugin->setName($name);
+        $plugin->setUserid($this->getUserid());
+        $plugin->save();
+    }
+
+    protected function desactivate($name) {
+        $this->delete(array(
+            'name' => $name,
+            'userid' => $this->getUserid()
+        ));
+    }
+
     protected function getAction($dirtyState) {
-        $state = (int) $dirtyState === 1;
-        $action = $state ? 'install' : 'uninstall';
-        return array(
-            'state' => $state,
-            'action' => $action
-        );
+        $state = (int) $dirtyState === 0;
+        return $state ? 'install' : 'uninstall';
     }
 
     function getUid(){
