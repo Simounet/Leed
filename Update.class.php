@@ -12,8 +12,8 @@ class Update{
     /**
      * Description : Récupération des fichiers déjà passés lors des anciennes mises à jour.
      */
-    private static function getUpdateFile(){
-        $updateFile = dirname(__FILE__).Update::FOLDER.'/update.json';
+    private function getUpdateFile(){
+        $updateFile = dirname(__FILE__).$this::FOLDER.'/update.json';
         if(!file_exists($updateFile)) {
             if (!touch($updateFile)) {
                 die ('Impossible d\'écrire dans le répertoire .'.dirname($updateFile).'. Merci d\'ajouter les droits necessaires.');
@@ -23,9 +23,9 @@ class Update{
         return json_decode(file_get_contents($updateFile),true);
     }
 
-    private static function addUpdateFile($addFile){
-        $updateFile = dirname(__FILE__).Update::FOLDER.'/update.json';
-        $originFile = Update::getUpdateFile();
+    private function addUpdateFile($addFile){
+        $updateFile = dirname(__FILE__).$this::FOLDER.'/update.json';
+        $originFile = $this->getUpdateFile();
         if(empty($originFile))
             $originFile = array();
         $newfile = array_merge($originFile,$addFile);
@@ -40,12 +40,12 @@ class Update{
     /**
      * Description : Permet de trouver les fichiers qui n'ont pas encore été joués
      */
-    private static function getNewPatch() {
-        $files = glob(dirname(__FILE__). Update::FOLDER .'/*.sql');
+    private function getNewPatch() {
+        $files = glob(dirname(__FILE__). $this::FOLDER .'/*.sql');
         if(empty($files))
             $files = array();
 
-        $jsonFiles = Update::getUpdateFile();
+        $jsonFiles = $this->getUpdateFile();
 
         $notPassed = array();
 
@@ -67,8 +67,8 @@ class Update{
      * Description : Permet l'execution des fichiers sql non joués
      * @simulation : true pour ne pas faire les actions en bdd
      */
-    public static function ExecutePatch($simulation=false) {
-        $newFilesForUpdate = Update::getNewPatch();
+    public function ExecutePatch($simulation=false) {
+        $newFilesForUpdate = $this->getNewPatch();
 
         //si aucun nouveau fichier de mise à jour à traiter @return : false
         if(count($newFilesForUpdate)==0) return false;
@@ -76,7 +76,7 @@ class Update{
             Functions::purgeRaintplCache();
             foreach($newFilesForUpdate as $file){
                 // récupération du contenu du sql
-                $sql = file_get_contents(dirname(__FILE__).Update::FOLDER.'/'.$file);
+                $sql = file_get_contents(dirname(__FILE__).$this::FOLDER.'/'.$file);
 
                 $conn = MysqlConnector::getInstance()->connection;
                 //on sépare chaque requête par les ;
@@ -87,7 +87,7 @@ class Update{
                         //remplacement des préfixes de table
                         $val = str_replace('##MYSQL_PREFIX##',MYSQL_PREFIX,$val);
                         $result = $conn->query($val);
-                        $ficlog = dirname(__FILE__).Update::FOLDER.'/'.substr($file,0,strlen($file)-3).'log';
+                        $ficlog = dirname(__FILE__).$this::FOLDER.'/'.substr($file,0,strlen($file)-3).'log';
                         if (false===$result) {
                             file_put_contents($ficlog, date('d/m/Y H:i:s').' : SQL : '.$val."\n", FILE_APPEND);
                             file_put_contents($ficlog, date('d/m/Y H:i:s').' : '.$conn->error."\n", FILE_APPEND);
@@ -104,7 +104,7 @@ class Update{
             session_destroy();
         }
         // quand toutes les requêtes ont été executées, on insert le sql dans le json
-        Update::addUpdateFile(array($newFilesForUpdate));
+        $this->addUpdateFile(array($newFilesForUpdate));
 
         return true;
     }

@@ -57,7 +57,8 @@ date_default_timezone_set('Europe/Paris');
 $configurationManager = new Configuration();
 $conf = $configurationManager->getAll();
 
-$resultUpdate = Update::ExecutePatch();
+$update = new Update();
+$resultUpdate = $update->ExecutePatch();
 
 $userManager = new User();
 $myUser = (isset($_SESSION['currentUser'])?unserialize($_SESSION['currentUser']):false);
