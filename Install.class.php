@@ -57,6 +57,7 @@ class Install {
             require_once('MysqlEntity.class.php');
             class_exists('Update') or require_once('Update.class.php');
             Update::ExecutePatch(true);
+            require_once('Plugin.class.php');
             require_once('Feed.class.php');
             require_once('Event.class.php');
             require_once('EventSub.class.php');
@@ -65,6 +66,7 @@ class Install {
             require_once('Configuration.class.php');
             require_once('UserConfiguration.class.php');
 
+            $this->createPlugin();
             $this->createConfig();
             $this->createUser();
             $this->createUserConfig();
@@ -103,6 +105,12 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
             $object->truncate();
         }
         $object->create();
+    }
+
+    protected function createPlugin() {
+        $pluginManager = new Plugin();
+        $this->createSimpleTable($pluginManager);
+        $pluginManager->setDefaults();
     }
 
     protected function createConfig() {

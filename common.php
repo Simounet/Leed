@@ -35,8 +35,8 @@ require_once('RainTPL.php');
 require_once('i18n.php');
 require_once('otphp/lib/otphp.php');
 class_exists('Functions') or require_once('Functions.class.php');
-class_exists('Plugin') or require_once('Plugin.class.php');
 class_exists('MysqlEntity') or require_once('MysqlEntity.class.php');
+class_exists('Plugin') or require_once('Plugin.class.php');
 class_exists('Update') or require_once('Update.class.php');
 class_exists('Feed') or require_once('Feed.class.php');
 class_exists('Event') or require_once('Event.class.php');
@@ -74,6 +74,9 @@ $eventSubManager = new EventSub();
 $folderManager = new Folder();
 
 $userId = $myUser ? $myUser->getId() : 1;
+
+$pluginManager = new Plugin();
+$pluginManager->setUserid($userId);
 
 $userConfigurationManager = new UserConfiguration($userId);
 $userConfigurationManager->getAll();

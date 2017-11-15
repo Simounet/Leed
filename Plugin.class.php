@@ -6,12 +6,26 @@
  @description: Classe de gestion des plugins au travers de l'application
  */
 
-class Plugin{
+class Plugin extends MysqlEntity{
 
+    protected $TABLE_NAME = 'plugin';
     const FOLDER = '/plugins';
     protected $name,$author,$address,$link,$licence,$path,$description,$version,$state,$type;
+    protected $userid = false;
+    protected $object_fields =
+    array(
+        'name' => 'string',
+        'userid' => 'integer'
+    );
 
-    function __construct(){
+    protected $object_fields_uniques =
+    array(
+        'name'=>'index',
+        'userid'=>'index',
+    );
+
+    public function __construct(){
+        parent::__construct();
     }
 
     public static function includeAll(){
@@ -465,6 +479,16 @@ class Plugin{
 
     function setType($type){
         $this->type = $type;
+    }
+
+    public function setUserid($userid)
+    {
+        $this->userid = $userid;
+    }
+
+    public function getUserid()
+    {
+        return $this->userid;
     }
 
 }
