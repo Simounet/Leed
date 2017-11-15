@@ -98,30 +98,28 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
             die('"'.self::CONSTANT_FILE.'" not found!');
     }
 
+    protected function createSimpleTable($object) {
+        if ($object->tableExists()) {
+            $object->truncate();
+        }
+        $object->create();
+    }
+
     protected function createConfig() {
         $configurationManager = new Configuration();
-        if ($configurationManager->tableExists()) {
-            $configurationManager->truncate();
-        }
-        $configurationManager->create();
+        $this->createSimpleTable($configurationManager);
         $configurationManager->setDefaults();
     }
 
     protected function createUserConfig() {
         $userConfigurationManager = new UserConfiguration();
-        if ($userConfigurationManager->tableExists()) {
-            $userConfigurationManager->truncate();
-        }
-        $userConfigurationManager->create();
+        $this->createSimpleTable($userConfigurationManager);
         $userConfigurationManager->setDefaults();
     }
 
     protected function createUser() {
         $userManager = new User();
-        if ($userManager->tableExists()) {
-            $userManager->truncate();
-        }
-        $userManager->create();
+        $this->createSimpleTable($userManager);
         $userManager->add($this->options['user']['login'], $this->options['user']['password'], $this->logger);
         $this->createSideTables();
         $userManager->createDefaultFolder();
