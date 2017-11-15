@@ -368,16 +368,25 @@ class Plugin extends MysqlEntity{
 
         foreach($plugins as $plugin){
             if($plugin->getUid()===$pluginUid){
+                $postActionProcess = true;
                 $pluginPath = $plugin->getPath();
                 if($action === 'install') {
                     $this->activate($pluginPath);
                 } else {
                     $this->desactivate($pluginPath);
+                    $postActionProcess = $this->remainingUsers($pluginPath);
                 }
-                $file = dirname($pluginPath).'/' . $action . '.php';
-                if(file_exists($file))require_once($file);
+                if($postActionProcess) {
+                    $file = dirname($pluginPath).'/' . $action . '.php';
+                    if(file_exists($file))require_once($file);
+                }
             }
         }
+    }
+
+    protected function remainingUsers($name) {
+        $users = $this->loadAll(array('name' => $name));
+        return count($users) === 0;
     }
 
     protected function activate($name) {
