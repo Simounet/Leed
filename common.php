@@ -58,7 +58,7 @@ $configurationManager = new Configuration();
 $conf = $configurationManager->getAll();
 
 $update = new Update();
-$resultUpdate = $update->ExecutePatch();
+$resultUpdate = $update->executePatch();
 
 $userManager = new User();
 $myUser = (isset($_SESSION['currentUser'])?unserialize($_SESSION['currentUser']):false);

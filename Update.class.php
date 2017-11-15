@@ -67,7 +67,7 @@ class Update{
      * Description : Permet l'execution des fichiers sql non joués
      * @simulation : true pour ne pas faire les actions en bdd
      */
-    public function ExecutePatch($simulation=false) {
+    public function executePatch($simulation=false) {
         $newFilesForUpdate = $this->getNewPatch();
 
         //si aucun nouveau fichier de mise à jour à traiter @return : false

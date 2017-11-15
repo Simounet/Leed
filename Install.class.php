@@ -57,7 +57,7 @@ class Install {
             require_once('MysqlEntity.class.php');
             class_exists('Update') or require_once('Update.class.php');
             $update = new Update();
-            $resultUpdate = $update->ExecutePatch(true);
+            $resultUpdate = $update->executePatch(true);
             require_once('Feed.class.php');
             require_once('Event.class.php');
             require_once('EventSub.class.php');
