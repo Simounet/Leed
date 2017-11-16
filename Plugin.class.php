@@ -382,9 +382,9 @@ class Plugin extends MysqlEntity{
                 $postActionProcess = true;
                 $pluginPath = $plugin->getPath();
                 if($action === 'install') {
-                    $this->activate($pluginPath);
+                    $this->enable($pluginPath);
                 } else {
-                    $this->desactivate($pluginPath);
+                    $this->disable($pluginPath);
                     $postActionProcess = $this->remainingUsers($pluginPath);
                 }
                 if($postActionProcess) {
@@ -400,14 +400,14 @@ class Plugin extends MysqlEntity{
         return count($users) === 0;
     }
 
-    protected function activate($name) {
+    protected function enable($name) {
         $plugin = new self();
         $plugin->setName($name);
         $plugin->setUserid($this->getUserid());
         $plugin->save();
     }
 
-    protected function desactivate($name) {
+    protected function disable($name) {
         $this->delete(array(
             'name' => $name,
             'userid' => $this->getUserid()
