@@ -303,6 +303,13 @@ class MysqlEntity
         return $objects;
     }
 
+    public function loadOnlyColumnGroupBy($selColumn, $groupBy) {
+        $query = 'SELECT `' . $selColumn . '` FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` GROUP BY `' . $groupBy . '`';
+        $result = $this->customQuery($query);
+        $objects = $this->getObjectsFromQuery($result);
+        return $objects;
+    }
+
 
     /**
     * Méthode de selection unique d'élements de l'entité

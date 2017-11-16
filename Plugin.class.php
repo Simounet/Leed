@@ -63,27 +63,25 @@ class Plugin extends MysqlEntity{
         return array($userId => $enabled);
     }
 
-    public function pruneStates() {
-        $plugin = new self();
-        $statesBefore = $plugin->getStates();
-        if(empty($statesBefore))
-            $statesBefore = array();
+    protected function getAllEnabled() {
+        $plugins = $this->loadOnlyColumnGroupBy('name', 'name');
+        $names = array();
+        foreach($plugins as $plugin) {
+            $names[] = $plugin->getName();
+        }
+        return $names;
+    }
 
-        $statesAfter = array();
-        $error = false;
-        if (is_array($statesBefore))
-        {
-            foreach($statesBefore as $userId => $plugins) {
-                foreach($plugins as $file=>$state) {
-                    if (file_exists($file))
-                        $statesAfter[$file] = $state;
-                    else
-                        $error = true;
-                }
+    public function pruneStates() {
+        $pluginsEnabled = $this->getAllEnabled();
+        $exists = $this->getPluginsStates();
+        $plugin = new Plugin();
+        foreach( $pluginsEnabled as $enabled ) {
+            if(!array_key_exists($enabled, $exists)) {
+                $plugin->disable($enabled);
             }
         }
-        // @TODO Multiuser remove unknown plugins
-        // if ($error) self::setStates($statesAfter);
+        return true;
     }
 
 
@@ -408,10 +406,13 @@ class Plugin extends MysqlEntity{
     }
 
     protected function disable($name) {
-        $this->delete(array(
-            'name' => $name,
-            'userid' => $this->getUserid()
-        ));
+        $columns = array(
+            'name' => $name
+        );
+        if($userId = $this->getUserid()) {
+            $columns['userid'] = $userid;
+        }
+        $this->delete($columns);
     }
 
     protected function getAction($dirtyState) {
