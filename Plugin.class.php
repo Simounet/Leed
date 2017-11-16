@@ -12,6 +12,7 @@ class Plugin extends MysqlEntity{
     const FOLDER = '/plugins';
     protected $name,$author,$address,$link,$licence,$path,$description,$version,$state,$type;
     protected $userid = false;
+    protected $pluginsStates = array();
     protected $object_fields =
     array(
         'name' => 'string',
@@ -30,7 +31,7 @@ class Plugin extends MysqlEntity{
 
     public function includeAll(){
         global $i18n, $i18n_js, $theme;
-        $pluginFiles = $this->getFiles(true);
+        $pluginFiles = $this->getPlugins(true);
         if(is_array($pluginFiles)) {
             foreach($pluginFiles as $pluginFile) {
                 // Chargement du fichier de Langue du plugin
@@ -130,7 +131,7 @@ class Plugin extends MysqlEntity{
     }
 
     public function getAll(){
-        $pluginFiles = $this->getFiles();
+        $pluginFiles = $this->getPlugins();
 
         $plugins = array();
         if(is_array($pluginFiles)) {
@@ -336,23 +337,33 @@ class Plugin extends MysqlEntity{
         }
     }
 
-    protected function getFiles($onlyActivated=false){
+    protected function getPlugins($onlyActivated = false) {
+        if(count($this->getPluginsStates()) === 0) {
+            $this->setFromFiles();
+        }
+        return $this->filterStates($onlyActivated);
+    }
 
-        $enabled = $disabled =  array();
+    protected function setFromFiles(){
         $files = glob(dirname(__FILE__). self::FOLDER .'/*/*.plugin*.php');
         if(empty($files))
             $files = array();
-
         foreach($files as $file){
             $plugin = $this->getObject($file);
-            if($plugin->getState()){
-                $enabled [] =  $file;
-            }else{
-                $disabled [] =  $file;
-            }
+            $pluginsStates[$file] = $plugin->getState();
         }
-        if(!$onlyActivated)$enabled = array_merge($enabled,$disabled);
-        return $enabled;
+        $this->setPluginsStates($pluginsStates);
+    }
+
+    protected function filterStates($onlyActivated=false) {
+        $plugins = array();
+        foreach($this->getPluginsStates() as $name => $state) {
+            if($onlyActivated !== false && $state === 0) {
+                continue;
+            }
+            $plugins[] = $name;
+        }
+        return $plugins;
     }
 
 
@@ -491,6 +502,16 @@ class Plugin extends MysqlEntity{
 
     function setVersion($version){
         $this->version = $version;
+    }
+
+    public function setPluginsStates($pluginsStates)
+    {
+        $this->pluginsStates = $pluginsStates;
+    }
+
+    public function getPluginsStates()
+    {
+        return $this->pluginsStates;
     }
 
     function getState(){
