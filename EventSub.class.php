@@ -99,23 +99,47 @@ class EventSub extends Event{
         ));
         $limit = $nbLines - $maxEvents;
         if ($limit<=0) return;
+        $eventIdsToDelete = $this->getUselessEventIds($feedId, $currentSyncId, $limit);
+        if(count($eventIdsToDelete) === 0 ) {
+            return false;
+        }
+        $eventSub = new self();
+        $eventSub->delete(array('eventid' => $eventIdsToDelete));
+        $event = new Event();
+        $event->delete(array('id' => $eventIdsToDelete));
+    }
+
+    private function getUselessEventIds($feedId, $currentSyncId, $limit)
+    {
         $tableEventSub = '`'.MYSQL_PREFIX.$this->TABLE_NAME."`";
-        $query = "DELETE sub1 FROM " . $tableEventSub . " sub1 ".
-        "INNER JOIN " .
-            "( SELECT * " .
-            "FROM " . $tableEventSub . " sub " .
-            "INNER JOIN " . MYSQL_PREFIX . "event ev " .
-            "ON sub.eventid = ev.id " .
+        $query = "SELECT eventid FROM " . $tableEventSub . " sub " .
+            "LEFT JOIN " . MYSQL_PREFIX . "event ev " .
+            "ON ( sub.eventid = ev.id ) " .
             "WHERE feedid={$feedId} " .
-            "AND favorite=0 " .
             "AND unread=0 " .
+            "AND favorite=0 " .
             "AND syncId!={$currentSyncId} " .
-            "ORDER BY pubdate ASC " .
-            "LIMIT {$limit} ) " .
-        "AS sub2 " .
-        "ON sub1.eventid = sub2.eventid";
-        ///@TODO: escape the variables inside mysql
-         $this->customQuery($query);
+            "AND (SELECT COUNT(*) " .
+            "FROM " . $tableEventSub . " " .
+            "WHERE eventid=sub.eventid " .
+            "AND unread=1)=0 " .
+            "ORDER BY syncId ASC " .
+            "LIMIT {$limit}";
+        $eventSubToDelete = $this->customQuery($query);
+        $eventIdsToDelete = $this->getEventIdsToDelete($eventSubToDelete);
+        return $eventIdsToDelete;
+    }
+
+    private function getEventIdsToDelete($eventSubToDelete)
+    {
+        $eventIdsToDelete = array();
+        if(!$eventSubToDelete || $eventSubToDelete->num_rows === 0) {
+            return $eventIdsToDelete;
+        }
+        while($event = $eventSubToDelete->fetch_array(MYSQLI_ASSOC)) {
+            $eventIdsToDelete[] = $event['eventid'];
+        }
+        return $eventIdsToDelete;
     }
 
     function getUserid(){
