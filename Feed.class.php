@@ -116,7 +116,6 @@ class Feed extends MysqlEntity{
         $items = $feed->get_items();
         $eventManager = new Event();
 
-        $events = array();
         $iEvents = 0;
         $newEventsIds = array();
         foreach($items as $item){
@@ -126,7 +125,6 @@ class Feed extends MysqlEntity{
             // Si le guid existe déjà, on évite de le reparcourir.
             $alreadyParsed = $eventManager->load(array('guid'=>$item->get_id(), 'feedurl'=>$this->url));
             if (isset($alreadyParsed)&&($alreadyParsed!=false)) {
-                $events[]=$alreadyParsed->getId();
                 continue;
             }
 
@@ -170,14 +168,6 @@ class Feed extends MysqlEntity{
             $nbEvents++;
         }
         $this->eventsSubSave($this->url, $newEventsIds);
-
-        $listid = "";
-        foreach($events as $item){
-            $listid.=','.$item;
-        }
-        $query='UPDATE `'.MYSQL_PREFIX.'event` SET syncId='.$syncId.' WHERE id in (0'.$listid.');';
-        $myQuery = $this->customQuery($query);
-
         $this->save();
         return true;
     }
