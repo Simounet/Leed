@@ -137,7 +137,7 @@ switch($action){
 $tpl->assign('pages',$pages);
 $tpl->assign('page',$page);
 
-$paginationScale = $userConfigurationManager->get('paginationScale');
+$paginationScale = $configurationManager->get('paginationScale');
 
 for($i=($page-$paginationScale<=0?1:$page-$paginationScale);$i<($page+$paginationScale>$pages+1?$pages+1:$page+$paginationScale);$i++){
     $pagesArray[]=$i;

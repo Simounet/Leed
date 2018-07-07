@@ -35,7 +35,6 @@ class UserConfiguration extends Configuration{
         'language' => 'en',
         'optionFeedIsVerbose' => 1,
         'otpEnabled' => 0,
-        'paginationScale' => 5,
         'theme' => 'marigolds'
     );
 
