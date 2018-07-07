@@ -76,7 +76,6 @@ $folderManager = new Folder();
 $userId = $myUser ? $myUser->getId() : 1;
 
 $pluginManager = new Plugin();
-$pluginManager->setUserid($userId);
 
 $userConfigurationManager = new UserConfiguration($userId);
 $userConfigurationManager->getAll();

@@ -6,32 +6,17 @@
  @description: Classe de gestion des plugins au travers de l'application
  */
 
-class Plugin extends MysqlEntity{
+class Plugin{
 
-    protected $TABLE_NAME = 'plugin';
     const FOLDER = '/plugins';
     protected $name,$author,$address,$link,$licence,$path,$description,$version,$state,$type;
-    protected $userid = false;
-    protected $pluginsStates = array();
-    protected $object_fields =
-    array(
-        'name' => 'string',
-        'userid' => 'integer'
-    );
 
-    protected $object_fields_uniques =
-    array(
-        'name'=>'index',
-        'userid'=>'index',
-    );
-
-    public function __construct(){
-        parent::__construct();
+    function __construct(){
     }
 
-    public function includeAll(){
+    public static function includeAll(){
         global $i18n, $i18n_js, $theme;
-        $pluginFiles = $this->getPlugins(true);
+        $pluginFiles = Plugin::getFiles(true);
         if(is_array($pluginFiles)) {
             foreach($pluginFiles as $pluginFile) {
                 // Chargement du fichier de Langue du plugin
@@ -51,41 +36,36 @@ class Plugin extends MysqlEntity{
         $i18n_js = $i18n->getJson();
     }
 
-    protected function getStates(){
-        $userId = $this->getUserid();
-        $enabled = array();
-        if($userId) {
-            $pluginsLoaded = $this->loadAll(array('userid' => $userId));
-            foreach($pluginsLoaded as $plugin) {
-                $enabled[$plugin->getName()] = 1;
+    private static function getStates(){
+        $stateFile = dirname(__FILE__).Plugin::FOLDER.'/plugins.states.json';
+        if(!file_exists($stateFile)) touch($stateFile);
+        return json_decode(file_get_contents($stateFile),true);
+    }
+    private static function setStates($states){
+        $stateFile = dirname(__FILE__).Plugin::FOLDER.'/plugins.states.json';
+        file_put_contents($stateFile,json_encode($states));
+    }
+    public static function pruneStates() {
+        $statesBefore = self::getStates();
+        if(empty($statesBefore))
+            $statesBefore = array();
+
+        $statesAfter = array();
+        $error = false;
+        if (is_array($statesBefore))
+        {
+            foreach($statesBefore as $file=>$state) {
+                if (file_exists($file))
+                    $statesAfter[$file] = $state;
+                else
+                    $error = true;
             }
         }
-        return array($userId => $enabled);
-    }
-
-    protected function getAllEnabled() {
-        $plugins = $this->loadOnlyColumnGroupBy('name', 'name');
-        $names = array();
-        foreach($plugins as $plugin) {
-            $names[] = $plugin->getName();
-        }
-        return $names;
-    }
-
-    public function pruneStates() {
-        $pluginsEnabled = $this->getAllEnabled();
-        $exists = $this->getPluginsStates();
-        $plugin = new Plugin();
-        foreach( $pluginsEnabled as $enabled ) {
-            if(!array_key_exists($enabled, $exists)) {
-                $plugin->disable($enabled);
-            }
-        }
-        return true;
+        if ($error) self::setStates($statesAfter);
     }
 
 
-    protected function getObject($pluginFile){
+    private static function getObject($pluginFile){
         $plugin = new Plugin();
         $fileLines = file_get_contents($pluginFile);
 
@@ -119,7 +99,7 @@ class Plugin extends MysqlEntity{
         if(preg_match("#@description\s(.+)[\r\n]#", $fileLines, $match))
             $plugin->setDescription(trim($match[1]));
 
-        if($this->loadState($pluginFile) || $plugin->getType()=='component'){
+        if(Plugin::loadState($pluginFile) || $plugin->getType()=='component'){
             $plugin->setState(1);
         }else{
             $plugin->setState(0);
@@ -128,17 +108,17 @@ class Plugin extends MysqlEntity{
         return $plugin;
     }
 
-    public function getAll(){
-        $pluginFiles = $this->getPlugins();
+    public static function getAll(){
+        $pluginFiles = Plugin::getFiles();
 
         $plugins = array();
         if(is_array($pluginFiles)) {
             foreach($pluginFiles as $pluginFile) {
-                $plugin = $this->getObject($pluginFile);
+                $plugin = Plugin::getObject($pluginFile);
                 $plugins[]=$plugin;
             }
         }
-        usort($plugins, "self::sortPlugin");
+        usort($plugins, "Plugin::sortPlugin");
         return $plugins;
     }
 
@@ -233,9 +213,8 @@ class Plugin extends MysqlEntity{
     }
 
     protected function getInstalledPluginsNames() {
-        $plugin = new self();
         $names = array();
-        $installedPlugins = $plugin->getAll();
+        $installedPlugins = self::getAll();
         if(!$installedPlugins || empty($installedPlugins)) {
             return $names;
         }
@@ -335,89 +314,60 @@ class Plugin extends MysqlEntity{
         }
     }
 
-    protected function getPlugins($onlyActivated = false) {
-        if(count($this->getPluginsStates()) === 0) {
-            $this->setFromFiles();
-        }
-        return $this->filterStates($onlyActivated);
-    }
+    public static function getFiles($onlyActivated=false){
 
-    protected function setFromFiles(){
-        $files = glob(dirname(__FILE__). self::FOLDER .'/*/*.plugin*.php');
+        $enabled = $disabled =  array();
+        $files = glob(dirname(__FILE__). Plugin::FOLDER .'/*/*.plugin*.php');
         if(empty($files))
             $files = array();
+
         foreach($files as $file){
-            $plugin = $this->getObject($file);
-            $pluginsStates[$file] = $plugin->getState();
-        }
-        $this->setPluginsStates($pluginsStates);
-    }
-
-    protected function filterStates($onlyActivated=false) {
-        $plugins = array();
-        foreach($this->getPluginsStates() as $name => $state) {
-            if($onlyActivated !== false && $state === 0) {
-                continue;
+            $plugin = Plugin::getObject($file);
+            if($plugin->getState()){
+                $enabled [] =  $file;
+            }else{
+                $disabled [] =  $file;
             }
-            $plugins[] = $name;
         }
-        return $plugins;
+        if(!$onlyActivated)$enabled = array_merge($enabled,$disabled);
+        return $enabled;
     }
 
 
-    protected function loadState($plugin){
-        $userId = $this->getUserid();
-        $states = $this->getStates();
-        return (isset($states[$userId]) && isset($states[$userId][$plugin])?$states[$userId][$plugin]:false);
+    public static function loadState($plugin){
+        $states = Plugin::getStates();
+        return (isset($states[$plugin])?$states[$plugin]:false);
     }
 
-    public function changeState($pluginUid, $state){
-        $plugins = $this->getAll();
-        $action = $this->getAction($state);
+    public static function changeState($plugin,$state){
+        $states = Plugin::getStates();
+        $states[$plugin] = $state;
+
+        Plugin::setStates($states);
+    }
+
+
+    public static function enabled($pluginUid){
+        $plugins = Plugin::getAll();
 
         foreach($plugins as $plugin){
-            if($plugin->getUid()===$pluginUid){
-                $postActionProcess = true;
-                $pluginPath = $plugin->getPath();
-                if($action === 'install') {
-                    $this->enable($pluginPath);
-                } else {
-                    $this->disable($pluginPath);
-                    $postActionProcess = $this->remainingUsers($pluginPath);
-                }
-                if($postActionProcess) {
-                    $file = dirname($pluginPath).'/' . $action . '.php';
-                    if(file_exists($file))require_once($file);
-                }
+            if($plugin->getUid()==$pluginUid){
+                Plugin::changeState($plugin->getPath(),true);
+                $install = dirname($plugin->getPath()).'/install.php';
+                if(file_exists($install))require_once($install);
             }
         }
     }
-
-    protected function remainingUsers($name) {
-        $users = $this->loadAll(array('name' => $name));
-        return count($users) === 0;
-    }
-
-    protected function enable($name) {
-        $plugin = new self();
-        $plugin->setName($name);
-        $plugin->setUserid($this->getUserid());
-        $plugin->save();
-    }
-
-    protected function disable($name) {
-        $columns = array(
-            'name' => $name
-        );
-        if($userId = $this->getUserid()) {
-            $columns['userid'] = $userid;
+    public static function disabled($pluginUid){
+        $plugins = Plugin::getAll();
+        foreach($plugins as $plugin){
+            if($plugin->getUid()==$pluginUid){
+                Plugin::changeState($plugin->getPath(),false);
+                $uninstall = dirname($plugin->getPath()).'/uninstall.php';
+                if(file_exists($uninstall))require_once($uninstall);
+            }
         }
-        $this->delete($columns);
-    }
 
-    protected function getAction($dirtyState) {
-        $state = (int) $dirtyState === 0;
-        return $state ? 'install' : 'uninstall';
     }
 
     function getUid(){
@@ -428,7 +378,7 @@ class Plugin extends MysqlEntity{
     }
 
 
-    protected static function sortPlugin($a, $b){
+    static function sortPlugin($a, $b){
         if ($a->getState() == $b->getState())
             if ($a->getName() == $b->getName())
                 return 0;
@@ -505,16 +455,6 @@ class Plugin extends MysqlEntity{
         $this->version = $version;
     }
 
-    public function setPluginsStates($pluginsStates)
-    {
-        $this->pluginsStates = $pluginsStates;
-    }
-
-    public function getPluginsStates()
-    {
-        return $this->pluginsStates;
-    }
-
     function getState(){
         return $this->state;
     }
@@ -528,16 +468,6 @@ class Plugin extends MysqlEntity{
 
     function setType($type){
         $this->type = $type;
-    }
-
-    public function setUserid($userid)
-    {
-        $this->userid = $userid;
-    }
-
-    public function getUserid()
-    {
-        return $this->userid;
     }
 
 }

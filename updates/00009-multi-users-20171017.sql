@@ -46,9 +46,3 @@ DELETE FROM `##MYSQL_PREFIX##configuration` WHERE `key` IN("articleDisplayAuthor
 ALTER TABLE `##MYSQL_PREFIX##user` ADD `cryptographicSalt` varchar(255) NOT NULL;
 UPDATE `##MYSQL_PREFIX##user` AS user INNER JOIN `##MYSQL_PREFIX##configuration` AS conf ON( conf.key="cryptographicSalt" ) SET user.cryptographicSalt=conf.value;
 DELETE FROM `##MYSQL_PREFIX##configuration` WHERE `key`="cryptographicSalt";
-
-CREATE TABLE `##MYSQL_PREFIX##plugin` (
-  `name` varchar(225) NOT NULL,
-  `userid` int(11) NOT NULL,
-  UNIQUE KEY (`name`, `userid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
