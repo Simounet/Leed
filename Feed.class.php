@@ -352,6 +352,10 @@ class Feed extends MysqlEntity{
         return $this->getObjectsFromQuery($result);
     }
 
+    public function getByUrl($url) {
+        return $this->load(array('url'=>$url),'=');
+    }
+
     function getFolder(){
         return $this->folder;
     }
