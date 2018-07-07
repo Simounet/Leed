@@ -13,7 +13,7 @@ Plugin::callHook("index_pre_treatment", array(&$_));
 $view = "article";
 $articleConf = array();
 //recuperation de tous les flux
-$allFeeds = $feedManager->getFeedsPerFolder($myUser->getId());
+$allFeeds = $feedManager->getFeedsPerFolder($userId);
 $tpl->assign('allFeeds',$allFeeds);
 $scroll = isset($_['scroll']) ? $_['scroll'] : 0;
 $tpl->assign('scrollpage',$scroll);
@@ -60,7 +60,7 @@ switch($action){
         $currentFeed = $feedManager->getById($_['feed']);
         $allowedOrder = array('date'=>'pubdate DESC','older'=>'pubdate','unread'=>'unread DESC,pubdate DESC');
         $order = (isset($_['order'])?$allowedOrder[$_['order']]:$allowedOrder['unread']);
-        $events = $currentFeed->getEvents($articleConf['startArticle'],$articleConf['articlePerPages'],$order,$target,false, array('userid' => $myUser->getId(), 'feedid' => $_['feed']));
+        $events = $currentFeed->getEvents($articleConf['startArticle'],$articleConf['articlePerPages'],$order,$target,false, array('userid' => $userId, 'feedid' => $_['feed']));
     break;
     /* AFFICHAGE DES EVENEMENTS D'UN DOSSIER EN PARTICULIER */
     case 'selectedFolder':
@@ -72,13 +72,13 @@ switch($action){
     case 'favorites':
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         $filter['favorite'] = 1;
-        $filter['userid'] = $myUser->getId();
+        $filter['userid'] = $userId;
         $events = $eventSubManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$articleConf['startArticle'].','.$articleConf['articlePerPages']);
     break;
     /* AFFICHAGE DES EVENEMENTS NON LUS (COMPORTEMENT PAR DEFAUT) */
     case 'unreadEvents':
     default:
-        $filter = array('unread'=>1, 'userid' => $myUser->getId());
+        $filter = array('unread'=>1, 'userid' => $userId);
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {

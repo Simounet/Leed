@@ -16,11 +16,11 @@ $action = (isset($_['action'])?$_['action']:'');
 $tpl->assign('action',$action);
 if($isAlwaysDisplayed) {
     //Récuperation des dossiers de flux par ordre de nom
-    $tpl->assign('folders',$folderManager->loadAllOnlyColumn('*',array('userid' => $myUser->getId()), 'name'));
+    $tpl->assign('folders',$folderManager->loadAllOnlyColumn('*',array('userid' => $userId), 'name'));
     //Recuperation de tous les non Lu
-    $tpl->assign('unread',$feedManager->countUnreadEvents($myUser->getId()));
+    $tpl->assign('unread',$feedManager->countUnreadEvents($userId));
     //recuperation de tous les flux
-    $allFeeds = $feedManager->getFeedsPerFolder($myUser->getId());
+    $allFeeds = $feedManager->getFeedsPerFolder($userId);
     $tpl->assign('allFeeds',$allFeeds);
     //recuperation de tous les flux par dossier
     $tpl->assign('allFeedsPerFolder',$allFeeds['folderMap']);
@@ -80,7 +80,7 @@ switch($action){
         $allowedOrder = array('date'=>'pubdate DESC','older'=>'pubdate','unread'=>'unread DESC,pubdate DESC');
         $order = (isset($_['order'])?$allowedOrder[$_['order']]:$allowedOrder['unread']);
         $pages = ceil($numberOfItem/$articlePerPages);
-        $events = $currentFeed->getEvents($startArticle,$articlePerPages,$order,$target, false, array('userid' => $myUser->getId(), 'feedid' => $_['feed']));
+        $events = $currentFeed->getEvents($startArticle,$articlePerPages,$order,$target, false, array('userid' => $userId, 'feedid' => $_['feed']));
 
         $tpl->assign('order',(isset($_['order'])?$_['order']:''));
 
@@ -98,7 +98,7 @@ switch($action){
     break;
     /* AFFICHAGE DES EVENEMENTS FAVORIS */
     case 'favorites':
-        $filter = array('favorite'=>1, 'userid' => $myUser->getId());
+        $filter = array('favorite'=>1, 'userid' => $userId);
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         $numberOfItem = $eventSubManager->rowCount($filter);
         $pages = ceil($numberOfItem/$articlePerPages);
@@ -116,19 +116,19 @@ switch($action){
         if(!$isAlwaysDisplayed) {
             break;
         }
-        $filter = array('unread'=>1, 'userid' => $myUser->getId());
+        $filter = array('unread'=>1, 'userid' => $userId);
         $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
         if($optionFeedIsVerbose) {
             $numberOfItem = $eventSubManager->rowCount($filter);
         } else {
-            $numberOfItem = $eventSubManager->getEventCountNotVerboseFeed($myUser->getId());
+            $numberOfItem = $eventSubManager->getEventCountNotVerboseFeed($userId);
         }
         $pages = ($articlePerPages>0?ceil($numberOfItem/$articlePerPages):1);
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {
             $events = $eventSubManager->loadAllOnlyColumn($target,$filter,$order,$startArticle.','.$articlePerPages);
         } else {
-            $events = $eventSubManager->getEventsNotVerboseFeed($startArticle,$articlePerPages,$order,$target,$myUser->getId());
+            $events = $eventSubManager->getEventsNotVerboseFeed($startArticle,$articlePerPages,$order,$target,$userId);
         }
         $tpl->assign('numberOfItem',$numberOfItem);
 
