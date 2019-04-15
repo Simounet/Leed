@@ -1,14 +1,14 @@
 <?php
 
 /*
- @nom: EventSub
+ @nom: EventUser
  @description: Classe de gestion des évenements/news liés a chaques flux RSS/ATOM
  */
 
-class EventSub extends Event{
+class EventUser extends Event{
 
     protected $userid,$eventid,$unread,$favorite;
-    protected $TABLE_NAME = 'event_sub';
+    protected $TABLE_NAME = 'event_user';
     protected $object_fields =
     array(
         'userid'=>'integer',
@@ -50,7 +50,7 @@ class EventSub extends Event{
     }
 
     public function getEventRelationFilter() {
-        return '`' . MYSQL_PREFIX . 'event` ON `' . MYSQL_PREFIX . 'event`.`id` = `' . MYSQL_PREFIX . 'event_sub`.`eventid`';
+        return '`' . MYSQL_PREFIX . 'event` ON `' . MYSQL_PREFIX . 'event`.`id` = `' . MYSQL_PREFIX . 'event_user`.`eventid`';
     }
 
     public function getEventCountPerFolder(){
@@ -103,40 +103,40 @@ class EventSub extends Event{
         if(count($eventIdsToDelete) === 0 ) {
             return false;
         }
-        $eventSub = new self();
-        $eventSub->delete(array('eventid' => $eventIdsToDelete));
+        $eventUser = new self();
+        $eventUser->delete(array('eventid' => $eventIdsToDelete));
         $event = new Event();
         $event->delete(array('id' => $eventIdsToDelete));
     }
 
     private function getUselessEventIds($feedId, $currentSyncId, $limit)
     {
-        $tableEventSub = '`'.MYSQL_PREFIX.$this->TABLE_NAME."`";
-        $query = "SELECT eventid FROM " . $tableEventSub . " sub " .
+        $tableEventUser = '`'.MYSQL_PREFIX.$this->TABLE_NAME."`";
+        $query = "SELECT eventid FROM " . $tableEventUser . " event_user " .
             "LEFT JOIN " . MYSQL_PREFIX . "event ev " .
-            "ON ( sub.eventid = ev.id ) " .
+            "ON ( event_user.eventid = ev.id ) " .
             "WHERE feedid={$feedId} " .
             "AND unread=0 " .
             "AND favorite=0 " .
             "AND syncId!={$currentSyncId} " .
             "AND (SELECT COUNT(*) " .
-            "FROM " . $tableEventSub . " " .
-            "WHERE eventid=sub.eventid " .
+            "FROM " . $tableEventUser . " " .
+            "WHERE eventid=event_user.eventid " .
             "AND unread=1)=0 " .
             "ORDER BY syncId ASC " .
             "LIMIT {$limit}";
-        $eventSubToDelete = $this->customQuery($query);
-        $eventIdsToDelete = $this->getEventIdsToDelete($eventSubToDelete);
+        $eventUserToDelete = $this->customQuery($query);
+        $eventIdsToDelete = $this->getEventIdsToDelete($eventUserToDelete);
         return $eventIdsToDelete;
     }
 
-    private function getEventIdsToDelete($eventSubToDelete)
+    private function getEventIdsToDelete($eventUserToDelete)
     {
         $eventIdsToDelete = array();
-        if(!$eventSubToDelete || $eventSubToDelete->num_rows === 0) {
+        if(!$eventUserToDelete || $eventUserToDelete->num_rows === 0) {
             return $eventIdsToDelete;
         }
-        while($event = $eventSubToDelete->fetch_array(MYSQLI_ASSOC)) {
+        while($event = $eventUserToDelete->fetch_array(MYSQLI_ASSOC)) {
             $eventIdsToDelete[] = $event['eventid'];
         }
         return $eventIdsToDelete;

@@ -39,7 +39,7 @@ if(isset($_['hightlighted'])) {
 
 $tpl->assign('time',$_SERVER['REQUEST_TIME']);
 
-$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_sub`.`unread`,`'.MYSQL_PREFIX.'event_sub`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
+$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_user`.`unread`,`'.MYSQL_PREFIX.'event_user`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
 if($articleDisplayMode=='summary') $target .= '`'.MYSQL_PREFIX.'event`.`description`,';
 if($articleDisplayMode=='content') $target .= '`'.MYSQL_PREFIX.'event`.`content`,';
 if($articleDisplayLink) $target .= '`'.MYSQL_PREFIX.'event`.`link`,';
@@ -70,21 +70,21 @@ switch($action){
     break;
     /* AFFICHAGE DES EVENEMENTS FAVORIS */
     case 'favorites':
-        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
+        $filter['LEFTJOIN'] = $eventUserManager->getEventRelationFilter();
         $filter['favorite'] = 1;
         $filter['userid'] = $userId;
-        $events = $eventSubManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$articleConf['startArticle'].','.$articleConf['articlePerPages']);
+        $events = $eventUserManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$articleConf['startArticle'].','.$articleConf['articlePerPages']);
     break;
     /* AFFICHAGE DES EVENEMENTS NON LUS (COMPORTEMENT PAR DEFAUT) */
     case 'unreadEvents':
     default:
         $filter = array('unread'=>1, 'userid' => $userId);
-        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
+        $filter['LEFTJOIN'] = $eventUserManager->getEventRelationFilter();
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {
-            $events = $eventSubManager->loadAllOnlyColumn($target,$filter,$order,$articleConf['startArticle'].','.$articleConf['articlePerPages']);
+            $events = $eventUserManager->loadAllOnlyColumn($target,$filter,$order,$articleConf['startArticle'].','.$articleConf['articlePerPages']);
         } else {
-            $events = $eventSubManager->getEventsNotVerboseFeed($articleConf['startArticle'],$articleConf['articlePerPages'],$order,$target);
+            $events = $eventUserManager->getEventsNotVerboseFeed($articleConf['startArticle'],$articleConf['articlePerPages'],$order,$target);
         }
         break;
 }

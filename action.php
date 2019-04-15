@@ -76,7 +76,7 @@ switch ($action){
         $whereClause['userid'] = $myUser->getId();
         if(isset($_['feed']))$whereClause['feedid'] = $_['feed'];
         if(isset($_['last-event-id']))$whereClause['eventid'] = '<= ' . $_['last-event-id'];
-        $eventSubManager->change(array('unread'=>'0'),$whereClause);
+        $eventUserManager->change(array('unread'=>'0'),$whereClause);
         if(!Functions::isAjaxCall()){
             header('location: ./index.php');
         }
@@ -92,7 +92,7 @@ switch ($action){
             $whereClause['unread'] = '1';
             $whereClause['feedid'] = $feed->getId();
             if(isset($_['last-event-id']))$whereClause['eventid'] = '<= ' . $_['last-event-id'];
-            $eventSubManager->change(array('unread'=>'0'),$whereClause);
+            $eventUserManager->change(array('unread'=>'0'),$whereClause);
         }
 
         if (!Functions::isAjaxCall()){
@@ -265,8 +265,8 @@ switch ($action){
             );
             $newFeed->setUserid($myUser->getId());
             $newFeed->save();
-            $eventSub = new EventSub();
-            $eventSub->populateOnKnownFeed($feedUrl, $newFeed->getId(), $myUser->getId());
+            $eventUser = new EventUser();
+            $eventUser->populateOnKnownFeed($feedUrl, $newFeed->getId(), $myUser->getId());
             $enableCache = ($configurationManager->get('synchronisationEnableCache')=='')?0:$configurationManager->get('synchronisationEnableCache');
             $forceFeed = ($configurationManager->get('synchronisationForceFeed')=='')?0:$configurationManager->get('synchronisationForceFeed');
             $newFeed->parse(time(), $_, $enableCache, $forceFeed);
@@ -345,8 +345,8 @@ switch ($action){
             exit();
         }
         if(isset($_['id'])){
-            $event = $eventSubManager->load(array('eventid'=>$_['id']));
-            $eventSubManager->change(array('unread'=>'0'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
+            $event = $eventUserManager->load(array('eventid'=>$_['id']));
+            $eventUserManager->change(array('unread'=>'0'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
         }
     break;
 
@@ -359,8 +359,8 @@ switch ($action){
             exit();
         }
         if(isset($_['id'])){
-            $event = $eventSubManager->load(array('eventid'=>$_['id']));
-            $eventSubManager->change(array('unread'=>'1'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
+            $event = $eventUserManager->load(array('eventid'=>$_['id']));
+            $eventUserManager->change(array('unread'=>'1'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
         }
     break;
 
@@ -372,7 +372,7 @@ switch ($action){
             echo json_encode($response_array);
             exit();
         }
-        $eventSubManager->change(array('favorite'=>'1'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
+        $eventUserManager->change(array('favorite'=>'1'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
     break;
 
     case 'removeFavorite':
@@ -383,7 +383,7 @@ switch ($action){
             echo json_encode($response_array);
             exit();
         }
-        $eventSubManager->change(array('favorite'=>'0'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
+        $eventUserManager->change(array('favorite'=>'0'),array('userid'=>$myUser->getId(),'eventid'=>$_['id']));
     break;
 
     case 'login':

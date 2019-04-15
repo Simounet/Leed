@@ -25,7 +25,7 @@ if($isAlwaysDisplayed) {
     //recuperation de tous les flux par dossier
     $tpl->assign('allFeedsPerFolder',$allFeeds['folderMap']);
     //recuperation de tous les event nons lu par dossiers
-    $tpl->assign('allEvents',$eventSubManager->getEventCountPerFolder());
+    $tpl->assign('allEvents',$eventUserManager->getEventCountPerFolder());
     //utilisé pour récupérer le statut d'un feed dans le template (en erreur ou ok)
     $feedState = new Feed();
     $tpl->assign('feedState',$feedState);
@@ -53,7 +53,7 @@ $tpl->assign('articlePerPages',$articlePerPages);
 $tpl->assign('displayOnlyUnreadFeedFolder',$displayOnlyUnreadFeedFolder);
 $tpl->assign('displayOnlyUnreadFeedFolder_reverse',$displayOnlyUnreadFeedFolder_reverse);
 
-$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_sub`.`unread`,`'.MYSQL_PREFIX.'event_sub`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
+$target = '`'.MYSQL_PREFIX.'event`.`title`,`'.MYSQL_PREFIX.'event_user`.`unread`,`'.MYSQL_PREFIX.'event_user`.`favorite`,`'.MYSQL_PREFIX.'event`.`feedurl`,';
 if($articleDisplayMode=='summary') $target .= '`'.MYSQL_PREFIX.'event`.`description`,';
 if($articleDisplayMode=='content') $target .= '`'.MYSQL_PREFIX.'event`.`content`,';
 if($articleDisplayLink) $target .= '`'.MYSQL_PREFIX.'event`.`link`,';
@@ -76,7 +76,7 @@ switch($action){
     case 'selectedFeed':
         $currentFeed = $feedManager->getById($_['feed']);
         $tpl->assign('currentFeed',$currentFeed);
-        $numberOfItem = $eventSubManager->rowCount(array('feedid'=>$currentFeed->getId()));
+        $numberOfItem = $eventUserManager->rowCount(array('feedid'=>$currentFeed->getId()));
         $allowedOrder = array('date'=>'pubdate DESC','older'=>'pubdate','unread'=>'unread DESC,pubdate DESC');
         $order = (isset($_['order'])?$allowedOrder[$_['order']]:$allowedOrder['unread']);
         $pages = ceil($numberOfItem/$articlePerPages);
@@ -99,10 +99,10 @@ switch($action){
     /* AFFICHAGE DES EVENEMENTS FAVORIS */
     case 'favorites':
         $filter = array('favorite'=>1, 'userid' => $userId);
-        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
-        $numberOfItem = $eventSubManager->rowCount($filter);
+        $filter['LEFTJOIN'] = $eventUserManager->getEventRelationFilter();
+        $numberOfItem = $eventUserManager->rowCount($filter);
         $pages = ceil($numberOfItem/$articlePerPages);
-        $events = $eventSubManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$startArticle.','.$articlePerPages);
+        $events = $eventUserManager->loadAllOnlyColumn($target,$filter,'pubdate DESC',$startArticle.','.$articlePerPages);
         $tpl->assign('numberOfItem',$numberOfItem);
     break;
 
@@ -117,18 +117,18 @@ switch($action){
             break;
         }
         $filter = array('unread'=>1, 'userid' => $userId);
-        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
+        $filter['LEFTJOIN'] = $eventUserManager->getEventRelationFilter();
         if($optionFeedIsVerbose) {
-            $numberOfItem = $eventSubManager->rowCount($filter);
+            $numberOfItem = $eventUserManager->rowCount($filter);
         } else {
-            $numberOfItem = $eventSubManager->getEventCountNotVerboseFeed($userId);
+            $numberOfItem = $eventUserManager->getEventCountNotVerboseFeed($userId);
         }
         $pages = ($articlePerPages>0?ceil($numberOfItem/$articlePerPages):1);
         if($articleDisplayHomeSort) {$order = 'pubdate desc';} else {$order = 'pubdate asc';}
         if($optionFeedIsVerbose) {
-            $events = $eventSubManager->loadAllOnlyColumn($target,$filter,$order,$startArticle.','.$articlePerPages);
+            $events = $eventUserManager->loadAllOnlyColumn($target,$filter,$order,$startArticle.','.$articlePerPages);
         } else {
-            $events = $eventSubManager->getEventsNotVerboseFeed($startArticle,$articlePerPages,$order,$target,$userId);
+            $events = $eventUserManager->getEventsNotVerboseFeed($startArticle,$articlePerPages,$order,$target,$userId);
         }
         $tpl->assign('numberOfItem',$numberOfItem);
 

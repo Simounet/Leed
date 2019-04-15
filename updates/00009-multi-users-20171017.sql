@@ -10,7 +10,7 @@
 --######################################################################################################
 ALTER TABLE `##MYSQL_PREFIX##folder` ADD userid int(11) DEFAULT 1;
 ALTER TABLE `##MYSQL_PREFIX##feed` ADD userid int(11) DEFAULT 1;
-CREATE TABLE `##MYSQL_PREFIX##event_sub` (
+CREATE TABLE `##MYSQL_PREFIX##event_user` (
     userid int(11) NOT NULL,
     feedid int(11) NOT NULL,
     eventid int(11) NOT NULL,
@@ -18,16 +18,16 @@ CREATE TABLE `##MYSQL_PREFIX##event_sub` (
     favorite int(1) DEFAULT 0,
     INDEX(userid, feedid, eventid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-INSERT INTO `##MYSQL_PREFIX##event_sub` (userid, feedid, eventid, unread, favorite) SELECT 1, feed, id, unread, favorite FROM `##MYSQL_PREFIX##event`;
+INSERT INTO `##MYSQL_PREFIX##event_user` (userid, feedid, eventid, unread, favorite) SELECT 1, feed, id, unread, favorite FROM `##MYSQL_PREFIX##event`;
 ALTER TABLE `##MYSQL_PREFIX##event` ADD feedurl text NOT NULL;
 UPDATE `##MYSQL_PREFIX##event` ev LEFT JOIN `##MYSQL_PREFIX##feed` fe ON ev.feed = fe.id SET ev.feedurl=fe.url;
 ALTER TABLE `##MYSQL_PREFIX##event` DROP INDEX uk_guid_feed;
 CREATE INDEX indexguid on `##MYSQL_PREFIX##event` (guid(60));
 ALTER TABLE `##MYSQL_PREFIX##event` DROP feed;
 CREATE INDEX urlindex ON `##MYSQL_PREFIX##event` (feedurl(100));
-UPDATE `##MYSQL_PREFIX##event_sub` sub LEFT JOIN `##MYSQL_PREFIX##event` ev ON ev.id = sub.eventid SET sub.unread = ev.unread;
+UPDATE `##MYSQL_PREFIX##event_user` sub LEFT JOIN `##MYSQL_PREFIX##event` ev ON ev.id = sub.eventid SET sub.unread = ev.unread;
 ALTER  TABLE `##MYSQL_PREFIX##event` DROP unread;
-UPDATE `##MYSQL_PREFIX##event_sub` sub LEFT JOIN `##MYSQL_PREFIX##event` ev ON ev.id = sub.eventid SET sub.favorite = ev.favorite;
+UPDATE `##MYSQL_PREFIX##event_user` sub LEFT JOIN `##MYSQL_PREFIX##event` ev ON ev.id = sub.eventid SET sub.favorite = ev.favorite;
 ALTER  TABLE `##MYSQL_PREFIX##event` DROP favorite;
 CREATE TABLE `##MYSQL_PREFIX##user_configuration` (
   `userid` int(11) NOT NULL,

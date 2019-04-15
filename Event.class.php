@@ -44,8 +44,8 @@ class Event extends MysqlEntity{
 
 
     function getEventCountNotVerboseFeed($userId=0){
-        $eventSubManager = new EventSub();
-        $results = $this->customQuery('SELECT COUNT(1) FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) INNER JOIN ' .$eventSubManager->getEventRelationFilter() . ' WHERE `'. MYSQL_PREFIX . 'event_sub`.`userid`=' . $userId . ' AND `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose`=0');
+        $eventUserManager = new EventUser();
+        $results = $this->customQuery('SELECT COUNT(1) FROM `'.MYSQL_PREFIX.$this->TABLE_NAME.'` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) INNER JOIN ' .$eventUserManager->getEventRelationFilter() . ' WHERE `'. MYSQL_PREFIX . 'event_user`.`userid`=' . $userId . ' AND `'.MYSQL_PREFIX.$this->TABLE_NAME.'`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose`=0');
         while($item = $results->fetch_array()){
             $nbitem =  $item[0];
         }
@@ -56,8 +56,8 @@ class Event extends MysqlEntity{
     function getEventsNotVerboseFeed($start=0,$limit=10000,$order,$columns='*',$userId=0){
         $eventManager = new Event();
         $objects = array();
-        $eventSubManager = new EventSub();
-        $results = $this->customQuery('SELECT '.$columns.' FROM `'.MYSQL_PREFIX.'event` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) INNER JOIN ' .$eventSubManager->getEventRelationFilter() . ' WHERE `'. MYSQL_PREFIX . 'event_sub`.`userid`=' . $userId . ' AND `'.MYSQL_PREFIX.'event`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose` = 0 ORDER BY '.$order.' LIMIT '.$start.','.$limit);
+        $eventUserManager = new EventUser();
+        $results = $this->customQuery('SELECT '.$columns.' FROM `'.MYSQL_PREFIX.'event` INNER JOIN `'.MYSQL_PREFIX.'feed` ON (`'.MYSQL_PREFIX.'event`.`feedurl` = `'.MYSQL_PREFIX.'feed`.`url`) INNER JOIN ' .$eventUserManager->getEventRelationFilter() . ' WHERE `'. MYSQL_PREFIX . 'event_user`.`userid`=' . $userId . ' AND `'.MYSQL_PREFIX.'event`.`unread`=1 AND `'.MYSQL_PREFIX.'feed`.`isverbose` = 0 ORDER BY '.$order.' LIMIT '.$start.','.$limit);
         if($results!=false){
             while($item = $results->fetch_array()){
                 $object = new Event();

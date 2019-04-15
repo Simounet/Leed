@@ -60,7 +60,7 @@ class Install {
             require_once('Plugin.class.php');
             require_once('Feed.class.php');
             require_once('Event.class.php');
-            require_once('EventSub.class.php');
+            require_once('EventUser.class.php');
             require_once('User.class.php');
             require_once('Folder.class.php');
             require_once('Configuration.class.php');
@@ -139,8 +139,8 @@ define('MYSQL_PREFIX','{$this->options['db']['mysqlPrefix']}');
         $feedManager->create();
         $eventManager = new Event();
         $eventManager->create();
-        $eventSubManager = new EventSub(null, null, false);
-        $eventSubManager->create();
+        $eventUserManager = new EventUser(null, null, false);
+        $eventUserManager->create();
         $folderManager = new Folder();
         $folderManager->create();
     }

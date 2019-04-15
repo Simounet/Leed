@@ -23,11 +23,11 @@ class Folder extends MysqlEntity{
         $results = $this->customQuery(
             'SELECT COUNT(`'.MYSQL_PREFIX.'event`.`id`) ' .
             'FROM `'.MYSQL_PREFIX.'event` ' .
-            'INNER JOIN `'.MYSQL_PREFIX.'event_sub` '.
-            'ON (`'.MYSQL_PREFIX.'event`.`id` = `'.MYSQL_PREFIX.'event_sub`.`eventid`) '.
+            'INNER JOIN `'.MYSQL_PREFIX.'event_user` '.
+            'ON (`'.MYSQL_PREFIX.'event`.`id` = `'.MYSQL_PREFIX.'event_user`.`eventid`) '.
             'INNER JOIN `'.MYSQL_PREFIX.'feed` '.
-            'ON (`'.MYSQL_PREFIX.'event_sub`.`feedid` = `'.MYSQL_PREFIX.'feed`.`id`) '.
-            'WHERE `'.MYSQL_PREFIX.'event_sub`.`unread`=1 ' .
+            'ON (`'.MYSQL_PREFIX.'event_user`.`feedid` = `'.MYSQL_PREFIX.'feed`.`id`) '.
+            'WHERE `'.MYSQL_PREFIX.'event_user`.`unread`=1 ' .
             'AND `'.MYSQL_PREFIX.'feed`.`folder` = '.$this->getId());
         $number = $results->fetch_array();
         return $number[0];
@@ -45,17 +45,17 @@ class Folder extends MysqlEntity{
         $query =
             'SELECT '.$columns.' '.
             'FROM `'.MYSQL_PREFIX.'event` '.
-            'INNER JOIN `'.MYSQL_PREFIX.'event_sub` '.
-            'ON (`'.MYSQL_PREFIX.'event`.`id` = `'.MYSQL_PREFIX.'event_sub`.`eventid`) '.
+            'INNER JOIN `'.MYSQL_PREFIX.'event_user` '.
+            'ON (`'.MYSQL_PREFIX.'event`.`id` = `'.MYSQL_PREFIX.'event_user`.`eventid`) '.
             'INNER JOIN `'.MYSQL_PREFIX.'feed` '.
-            'ON (`'.MYSQL_PREFIX.'event_sub`.`feedid` = `'.MYSQL_PREFIX.'feed`.`id`) '.
+            'ON (`'.MYSQL_PREFIX.'event_user`.`feedid` = `'.MYSQL_PREFIX.'feed`.`id`) '.
             $whereClause.' '.
             'ORDER BY '.$order.' '.
             'LIMIT '.$start.','.$limit;
         $results = $this->customQuery($query);
         if($results!=false){
             while($item = $results->fetch_array()){
-                $object = new EventSub();
+                $object = new EventUser();
                     foreach($object->getObject_fields() as $field=>$type){
                         $setter = 'set'.ucFirst($field);
                         if(isset($item[$field])) $object->$setter($item[$field]);

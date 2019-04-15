@@ -46,8 +46,8 @@ class Feed extends MysqlEntity{
         );
         $event = new Event();
         $event->clean($this->getUrl());
-        $eventSub = new EventSub();
-        $eventSub->delete(
+        $eventUser = new EventUser();
+        $eventUser->delete(
             array(
                 'userid' => $userId,
                 'feedid' => $this->getId()
@@ -184,8 +184,8 @@ class Feed extends MysqlEntity{
                 'feedid' => $feed->getId()
             );
         }
-        $eventSub = new EventSub();
-        $eventSub->saveEventsSub($eventsIds, $users);
+        $eventUser = new EventUser();
+        $eventUser->saveEventsSub($eventsIds, $users);
     }
 
     protected function getEnclosureHtml($enclosure) {
@@ -268,8 +268,8 @@ class Feed extends MysqlEntity{
     }
 
     public function rowCount($filter=array()) {
-        $eventSubManager = new EventSub();
-        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
+        $eventUserManager = new EventUser();
+        $filter['LEFTJOIN'] = $eventUserManager->getEventRelationFilter();
         parent::rowCount($filter);
     }
 
@@ -277,28 +277,28 @@ class Feed extends MysqlEntity{
         return $this->loadAll(array('folder' => $folderId), 'name');
     }
 
-    function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false, $eventSubFilters=array()){
-        $eventSubManager = new EventSub();
-        $filter['LEFTJOIN'] = $eventSubManager->getEventRelationFilter();
-        if(isset($eventSubFilters['userid'])) {
-            $filter[MYSQL_PREFIX.'event_sub.userid'] = $eventSubFilters['userid'];
+    function getEvents($start=0,$limit=10000,$order,$columns='*',$filter=false, $eventUserFilters=array()){
+        $eventUserManager = new EventUser();
+        $filter['LEFTJOIN'] = $eventUserManager->getEventRelationFilter();
+        if(isset($eventUserFilters['userid'])) {
+            $filter[MYSQL_PREFIX.'event_user.userid'] = $eventUserFilters['userid'];
         }
-        if(isset($eventSubFilters['feedid'])) {
-            $filter[MYSQL_PREFIX.'event_sub.feedid'] = $eventSubFilters['feedid'];
+        if(isset($eventUserFilters['feedid'])) {
+            $filter[MYSQL_PREFIX.'event_user.feedid'] = $eventUserFilters['feedid'];
         }
-        $events = $eventSubManager->loadAllOnlyColumn($columns,$filter,$order,$start.','.$limit);
+        $events = $eventUserManager->loadAllOnlyColumn($columns,$filter,$order,$start.','.$limit);
         return $events;
     }
 
     function countUnreadEvents($userId){
         $unreads = array();
-        $eventSubManager = new EventSub();
+        $eventUserManager = new EventUser();
         $results = $this->customQuery(
-            "SELECT COUNT(`".MYSQL_PREFIX."event_sub`.`eventid`), `".MYSQL_PREFIX."event_sub`.`feedid` " .
-            "FROM `".MYSQL_PREFIX."event_sub` " .
-            "WHERE `". MYSQL_PREFIX . "event_sub`.`userid`=" . $userId . " " .
-            "AND `".MYSQL_PREFIX."event_sub`.`unread` = 1 " .
-            "GROUP BY `".MYSQL_PREFIX."event_sub`.`feedid`"
+            "SELECT COUNT(`".MYSQL_PREFIX."event_user`.`eventid`), `".MYSQL_PREFIX."event_user`.`feedid` " .
+            "FROM `".MYSQL_PREFIX."event_user` " .
+            "WHERE `". MYSQL_PREFIX . "event_user`.`userid`=" . $userId . " " .
+            "AND `".MYSQL_PREFIX."event_user`.`unread` = 1 " .
+            "GROUP BY `".MYSQL_PREFIX."event_user`.`feedid`"
         );
         if($results!=false){
             $total = 0;
@@ -443,8 +443,8 @@ class Feed extends MysqlEntity{
             }
             if (!$parseOk && !$commandLine) echo '</div>';
 //             if ($commandLine) echo "\n";
-            $eventSub = new EventSub();
-            $eventSub->removeOlds($feed->id, $maxEvents, $syncId);
+            $eventUser = new EventUser();
+            $eventUser->removeOlds($feed->id, $maxEvents, $syncId);
         }
         assert('$nbTotal==$nbOk+$nbErrors');
         $totalTime = microtime(true)-$start;
